@@ -1,6 +1,5 @@
 import type { V2_MetaFunction } from "@remix-run/node";
 import { useEffect, useState } from "react";
-import { date } from "zod";
 
 const title = "Super Badstu Bestiller";
 export const meta: V2_MetaFunction = () => {
@@ -8,7 +7,7 @@ export const meta: V2_MetaFunction = () => {
 };
 
 export default function Component() {
-  const [url, setUrl] = useState("http://test");
+  const [url, setUrl] = useState("");
   const [dateFormat, setDateformat] = useState<"relative" | "absolute">(
     "relative"
   );
@@ -106,12 +105,26 @@ export default function Component() {
           <input required name="time" />
         </label>
 
-        <fieldset>
+        <div className="grid">
+          <fieldset>
+            <label>
+              <input name="isMember" role="switch" type="checkbox" />
+              Medlem
+            </label>
+          </fieldset>
           <label>
-            <input name="isMember" role="switch" type="checkbox" />
-            Medlem
+            Antall
+            <select required name="antall">
+              {Array(4)
+                .fill(0)
+                .map((_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    {i + 1}
+                  </option>
+                ))}
+            </select>
           </label>
-        </fieldset>
+        </div>
 
         <div className="grid">
           <label>

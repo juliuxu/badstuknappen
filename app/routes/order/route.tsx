@@ -2,7 +2,7 @@ import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { defer } from "@remix-run/node";
 import { Await, useLoaderData } from "@remix-run/react";
 import { Suspense } from "react";
-import { orderInfoSchema, placeOrder } from "./order";
+import { orderInfoSchema, placeOrder } from "./order.server";
 
 export const meta: V2_MetaFunction = () => {
   return [{ title: "Hello" }];
@@ -14,6 +14,7 @@ export const loader = async ({ request }: LoaderArgs) => {
   );
   const result = placeOrder(orderInfo);
   return defer({
+    orderInfo,
     result,
   });
 };
