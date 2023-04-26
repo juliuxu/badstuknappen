@@ -19,6 +19,17 @@ export default function App() {
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css"
         />
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `        
+@media (min-width: 600px) {
+  .grid {
+      grid-template-columns: repeat(auto-fit,minmax(0%,1fr));
+  }
+}
+        `,
+          }}
+        />
 
         <Meta />
         <Links />

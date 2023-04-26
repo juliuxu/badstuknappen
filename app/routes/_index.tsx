@@ -1,5 +1,6 @@
 import type { V2_MetaFunction } from "@remix-run/node";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { date } from "zod";
 
 const title = "Super Badstu Bestiller";
 export const meta: V2_MetaFunction = () => {
@@ -8,6 +9,19 @@ export const meta: V2_MetaFunction = () => {
 
 export default function Component() {
   const [url, setUrl] = useState("http://test");
+  const [dateFormat, setDateformat] = useState<"relative" | "absolute">(
+    "relative"
+  );
+  useEffect(() => {
+    if (dateFormat === "absolute") {
+      document
+        .querySelectorAll("input[name='date'][type='radio']")
+        ?.forEach((input) => {
+          (input as HTMLInputElement).checked = false;
+        });
+    }
+  }, [dateFormat]);
+
   return (
     <main className="container">
       <h1>{title}</h1>
@@ -53,17 +67,42 @@ export default function Component() {
             <option value="langkaia">Langkaia</option>
           </select>
         </label>
+
+        <div className="grid">
+          <div onClick={() => setDateformat("relative")}>
+            <fieldset disabled={dateFormat !== "relative"}>
+              <legend>Velg neste</legend>
+              {[
+                "mandag",
+                "tirsdag",
+                "onsdag",
+                "torsdag",
+                "fredag",
+                "lørdag",
+                "søndag",
+              ].map((dag) => (
+                <label key={dag}>
+                  <input type="radio" name="date" value={`neste-${dag}`} />
+                  {dag[0].toUpperCase() + dag.slice(1)}
+                </label>
+              ))}
+            </fieldset>
+          </div>
+          <div onClick={() => setDateformat("absolute")}>
+            <label>
+              Eller dato
+              <input
+                disabled={dateFormat !== "absolute"}
+                required
+                name="date"
+                type="date"
+                min={new Date().toISOString().split("T")[0]}
+              />
+            </label>
+          </div>
+        </div>
         <label>
-          Date
-          <input
-            required
-            name="date"
-            type="date"
-            min={new Date().toISOString().split("T")[0]}
-          />
-        </label>
-        <label>
-          Time
+          Tidspunkt
           <input required name="time" />
         </label>
 
@@ -96,9 +135,6 @@ export default function Component() {
         </div>
 
         <button type="submit">Bygg url</button>
-        {/* <button type="button" className="outline contrast">
-          Bygg URL
-        </button> */}
       </form>
     </main>
   );

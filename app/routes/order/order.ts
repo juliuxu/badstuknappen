@@ -18,7 +18,18 @@ const buildOrderUrl = ({ sted, date, time }: OrderUrlInfo) => {
 
 export const orderInfoSchema = z.object({
   sted: z.enum(["sukkerbiten", "langkaia"]),
-  date: z.string(),
+  date: z.union([
+    z.enum([
+      "neste-mandag",
+      "neste-tirsdag",
+      "neste-onsdag",
+      "neste-torsdag",
+      "neste-fredag",
+      "neste-lørdag",
+      "neste-søndag",
+    ]),
+    z.string().regex(/\d{4}-[01]\d-[0-3]\d/),
+  ]),
   time: z.string(),
 
   isMember: z.boolean().default(true),
