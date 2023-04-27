@@ -3,6 +3,9 @@
 ARG NODE_VERSION=18
 FROM node:${NODE_VERSION}-slim as base
 
+# Install playwright browser
+RUN npx playwright install --with-deps chromium
+
 # Remix app lives here
 WORKDIR /app
 
@@ -28,15 +31,10 @@ RUN npm prune --production
 
 
 # Final stage for app image
-# FROM base
-FROM mcr.microsoft.com/playwright:v1.32.3-focal
-WORKDIR /app
+FROM base
 
 # Copy built application
 COPY --from=build /app /app
-
-# RUN npx playwright install --with-deps chromium
-
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
