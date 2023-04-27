@@ -62,15 +62,17 @@ export const getOrderInfo = (fromUrl: string) =>
 
 export async function placeOrder(
   orderInfo: OrderInfo,
-  log: (obj: { event?: string; data: string }) => void
+  log: (obj: { event?: string; data: string }) => void,
+  abortController: AbortController
 ) {
   if (orderInfo.password !== process.env.PASSWORD) {
     log({ data: `❌ WRONG PASSWORD ❌` });
+    abortController.abort();
     return;
   }
 
   log({
-    data: `🤖 Ordering with info: ${JSON.stringify(orderInfo, null, 2)}`,
+    data: `🤖 Ordering with info: ${JSON.stringify(orderInfo)}`,
   });
 
   // Start playwright
@@ -84,8 +86,9 @@ export async function placeOrder(
   // Cleanup function
   async function cleanup() {
     if (!orderInfo.debug) {
-      await page.close();
+      await browser.close();
     }
+    abortController.abort();
   }
 
   // Url
@@ -144,7 +147,7 @@ export async function placeOrder(
       .textContent(),
     price: await page.locator(".cart-item .price").textContent(),
   };
-  log({ data: `🛒 shooping card ${JSON.stringify(shoppingCart, null, 2)}` });
+  log({ data: `🛒 shooping card ${JSON.stringify(shoppingCart)}` });
 
   // Confirm
   log({ data: `🤘 clicking Bekreft/Betal` });
@@ -157,7 +160,7 @@ export async function placeOrder(
     time: await page.locator("tbody > tr .col_time").textContent(),
     price: await page.locator("tbody > tr .col_price").textContent(),
   };
-  log({ data: `📠 order line ${JSON.stringify(orderLine, null, 2)}` });
+  log({ data: `📠 order line ${JSON.stringify(orderLine)}` });
 
   // Pay
   log({ data: `🤘 clicking Betal nå` });
@@ -196,15 +199,7 @@ export async function placeOrder(
   await cleanup();
 }
 
-// export async function getSteder(page: playwright.Page) {
-//   await page.goto("https://oslobadstuforening.no/sok-dropin/");
-
-//   const options = await page.locator("#box_prop_res_sted > option").all();
-//   return (
-//     await Promise.all(options.map((option) => option.getAttribute("value")))
-//   ).filter((sted) => sted !== "none");
-// }
-
+// Password
 const envVariables = z.object({
   PASSWORD: z.string().nonempty(),
 });

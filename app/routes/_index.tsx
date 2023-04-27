@@ -1,5 +1,6 @@
-import type { V2_MetaFunction } from "@remix-run/node";
-import { useSearchParams } from "@remix-run/react";
+import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { useLoaderData, useSearchParams } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { ukedagToDate, ukedager } from "~/utils";
 
@@ -8,7 +9,18 @@ export const meta: V2_MetaFunction = () => {
   return [{ title }];
 };
 
+export const loader = ({ request }: LoaderArgs) => {
+  const url = new URL(request.url);
+  return json({
+    isLocal:
+      url.hostname.includes("192.168") ||
+      url.hostname.includes("127.0.0.1") ||
+      url.hostname.includes("localhost"),
+  });
+};
+
 export default function Component() {
+  const { isLocal } = useLoaderData<typeof loader>();
   const [url, setUrl] = useState("");
 
   const [search] = useSearchParams();
@@ -30,21 +42,29 @@ export default function Component() {
   return (
     <main className="container">
       <h1>{title}</h1>
+      <p></p>
 
       {url && (
         <>
-          <h2 id="url">URL</h2>
+          <hgroup>
+            <h2 id="url">🎉 Linken er klar 🎉</h2>
+            <h3>Åpne linken når du er klar for å bestille</h3>
+          </hgroup>
+          <a href={url} target="_blank" rel="noreferrer">
+            👉 Trykk her eller kopier linken for senere 👈
+          </a>
+          <br />
+          <br />
           <pre>
             <code>{url}</code>
           </pre>
-          <a href={url} target="_blank" rel="noreferrer">
-            {url}
-          </a>
         </>
       )}
 
-      <h2>URL Bygger</h2>
-
+      <hgroup>
+        <h2>URL Bygger</h2>
+        <h3>Bygg din personlige badstue bestiller url</h3>
+      </hgroup>
       <form
         action="/order"
         method="get"
@@ -161,6 +181,15 @@ export default function Component() {
             <input required name="mobil" type="tel" />
           </label>
         </div>
+
+        {isLocal && (
+          <fieldset>
+            <label>
+              <input name="debug" role="switch" type="checkbox" />
+              Debug
+            </label>
+          </fieldset>
+        )}
 
         <button type="submit">Bygg url</button>
       </form>
