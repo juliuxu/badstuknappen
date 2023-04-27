@@ -139,7 +139,12 @@ export default function Component() {
         </div>
         <label>
           Tidspunkt
-          <input required name="time" placeholder="e.g. 07, 8.5, 10" />
+          <input
+            required
+            name="time"
+            inputMode="numeric"
+            placeholder="e.g. 07, 8.5, 10"
+          />
         </label>
 
         <fieldset>
