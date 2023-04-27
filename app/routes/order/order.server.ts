@@ -76,7 +76,7 @@ export const orderInfoSchema = z.object({
   epost: z.string(),
   mobil: z.string(),
 
-  debug: z.boolean().default(true),
+  debug: z.boolean().default(false),
 });
 type OrderInfo = z.infer<typeof orderInfoSchema>;
 export async function placeOrder(orderInfo: OrderInfo) {
@@ -143,19 +143,24 @@ export async function placeOrder(orderInfo: OrderInfo) {
   console.log("📠 order line", orderLine);
 
   // Pay
+  console.log("Betal nå");
   await page.getByText("Betal nå").click();
 
   // Pay with Vipps
+  console.log("Pay with vipps");
   await page.locator("#paymentMethodHeading_vipps").click();
 
+  console.log("Fill number");
   await page.locator("#vippsPhonenumber").fill(orderInfo.mobil);
   await page.locator("#vippsPhonenumber").blur();
 
   // Request payment
+  console.log("go to Vipps!");
   await page.locator("#vippsContinueBtn").click();
 
   // Click Vipps next button
   // Number is autofilled
+  console.log("💰 clicking final Vipps button");
   await page.locator(".primary-button").click();
 
   if (!orderInfo.debug) page.close();
