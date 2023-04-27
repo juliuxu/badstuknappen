@@ -1,10 +1,8 @@
-// https://www.mywebtuts.com/blog/how-to-get-next-sunday-date-in-javascript
+// https://stackoverflow.com/questions/1579010/get-next-date-from-weekday-in-javascript
 function nextDate(dayIndex: number) {
-  const today = new Date();
-  today.setDate(today.getDate() + ((7 - today.getDay() + dayIndex) % 7 || 7));
-  // HACK
-  today.setHours(6);
-  return today;
+  const date = new Date();
+  date.setDate(date.getDate() + ((dayIndex + (7 - date.getDay())) % 7));
+  return date;
 }
 
 export const ukedager = [
@@ -18,7 +16,7 @@ export const ukedager = [
 ] as const;
 export type Ukedag = typeof ukedager[number];
 
-export function ukedagToDate(value: Ukedag) {
+export function nesteUkedagToDate(value: Ukedag) {
   const dayToDayIndex: Record<Ukedag, number> = {
     mandag: 1,
     tirsdag: 2,
@@ -28,6 +26,13 @@ export function ukedagToDate(value: Ukedag) {
     lørdag: 6,
     søndag: 0,
   };
+  console.log(
+    `nesteUkedagToDate: ${nextDate(dayToDayIndex[value]).toDateString()}`
+  );
+  if (dayToDayIndex[value] === undefined) {
+    throw new Error(`invalid ukedag ${value}`);
+  }
+
   return nextDate(dayToDayIndex[value]).toISOString().split("T")[0];
 }
 

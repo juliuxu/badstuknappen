@@ -1,7 +1,7 @@
 import playwright from "playwright";
 import { z } from "zod";
 import type { Ukedag } from "~/utils";
-import { ukedagToDate } from "~/utils";
+import { nesteUkedagToDate } from "~/utils";
 
 const stedToStedId: Record<OrderInfo["sted"], string> = {
   sukkerbiten: "184637%27,184637)",
@@ -32,7 +32,7 @@ export const orderInfoSchema = z.object({
         "neste-søndag",
       ])
       .transform((value) => {
-        return ukedagToDate(value.split("-")[0] as Ukedag);
+        return nesteUkedagToDate(value.split("-")[1] as Ukedag);
       }),
     z.string().regex(/\d{4}-[01]\d-[0-3]\d/),
   ]),

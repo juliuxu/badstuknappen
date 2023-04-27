@@ -2,7 +2,7 @@ import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData, useSearchParams } from "@remix-run/react";
 import { useEffect, useState } from "react";
-import { ukedagToDate, ukedager } from "~/utils";
+import { nesteUkedagToDate, ukedager } from "~/utils";
 
 const title = "Super Badstue Bestiller";
 export const meta: V2_MetaFunction = () => {
@@ -116,7 +116,7 @@ export default function Component() {
                       // Preview the date
                       document.querySelector<HTMLInputElement>(
                         `input[name="date"][type="date"]`
-                      )!.value = ukedagToDate(dag);
+                      )!.value = nesteUkedagToDate(dag);
                     }}
                   />
                   {dag[0].toUpperCase() + dag.slice(1)}
