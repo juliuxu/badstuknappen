@@ -73,6 +73,7 @@ export async function placeOrder(
     data: `🤖 Ordering with info: ${JSON.stringify(orderInfo, null, 2)}`,
   });
 
+  // Start playwright
   const browser = await playwright.chromium.launch({
     headless: !orderInfo.debug,
     slowMo: orderInfo.debug ? 400 : 200,

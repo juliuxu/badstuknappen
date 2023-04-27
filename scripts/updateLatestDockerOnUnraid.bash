@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONTAINER_NAME=super-badstu
+CONTAINER_NAME=super-badstue
 COOKIE_JAR=$(mktemp)
 
 [[ -z "${UNRAID_HTTP_USERNAME}" ]] && echo "❌ Environment variable UNRAID_HTTP_USERNAME is missing" && exit 1
