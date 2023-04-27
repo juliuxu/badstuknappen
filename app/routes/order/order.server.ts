@@ -169,11 +169,11 @@ export async function placeOrder(orderInfo: OrderInfo) {
   };
 }
 
-export async function getSteder(page: playwright.Page) {
-  await page.goto("https://oslobadstuforening.no/sok-dropin/");
+// export async function getSteder(page: playwright.Page) {
+//   await page.goto("https://oslobadstuforening.no/sok-dropin/");
 
-  const options = await page.locator("#box_prop_res_sted > option").all();
-  return (
-    await Promise.all(options.map((option) => option.getAttribute("value")))
-  ).filter((sted) => sted !== "none");
-}
+//   const options = await page.locator("#box_prop_res_sted > option").all();
+//   return (
+//     await Promise.all(options.map((option) => option.getAttribute("value")))
+//   ).filter((sted) => sted !== "none");
+// }
