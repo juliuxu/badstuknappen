@@ -1,5 +1,7 @@
 import type { V2_MetaFunction } from "@remix-run/node";
+import { useSearchParams } from "@remix-run/react";
 import { useEffect, useState } from "react";
+import { ukedagToDate, ukedager } from "~/utils";
 
 const title = "Super Badstu Bestiller";
 export const meta: V2_MetaFunction = () => {
@@ -8,6 +10,10 @@ export const meta: V2_MetaFunction = () => {
 
 export default function Component() {
   const [url, setUrl] = useState("");
+
+  const [search] = useSearchParams();
+
+  // Date selector logic
   const [dateFormat, setDateformat] = useState<"relative" | "absolute">(
     "relative"
   );
@@ -59,6 +65,12 @@ export default function Component() {
           }, 100);
         }}
       >
+        <input
+          hidden
+          readOnly
+          name="password"
+          value={search.get("password") ?? ""}
+        />
         <label>
           Sted
           <select required name="sted">
@@ -71,17 +83,20 @@ export default function Component() {
           <div onClick={() => setDateformat("relative")}>
             <fieldset disabled={dateFormat !== "relative"}>
               <legend>Velg neste</legend>
-              {[
-                "mandag",
-                "tirsdag",
-                "onsdag",
-                "torsdag",
-                "fredag",
-                "lørdag",
-                "søndag",
-              ].map((dag) => (
+              {ukedager.map((dag) => (
                 <label key={dag}>
-                  <input type="radio" name="date" value={`neste-${dag}`} />
+                  <input
+                    type="radio"
+                    name="date"
+                    value={`neste-${dag}`}
+                    required
+                    onClick={() => {
+                      // Preview the date
+                      document.querySelector<HTMLInputElement>(
+                        `input[name="date"][type="date"]`
+                      )!.value = ukedagToDate(dag);
+                    }}
+                  />
                   {dag[0].toUpperCase() + dag.slice(1)}
                 </label>
               ))}
@@ -102,29 +117,27 @@ export default function Component() {
         </div>
         <label>
           Tidspunkt
-          <input required name="time" />
+          <input required name="time" placeholder="e.g. 07, 8.5, 10" />
         </label>
 
-        <div className="grid">
-          <fieldset>
-            <label>
-              <input name="isMember" role="switch" type="checkbox" />
-              Medlem
-            </label>
-          </fieldset>
+        <fieldset>
           <label>
-            Antall
-            <select required name="antall">
-              {Array(4)
-                .fill(0)
-                .map((_, i) => (
-                  <option key={i + 1} value={i + 1}>
-                    {i + 1}
-                  </option>
-                ))}
-            </select>
+            <input name="isMember" role="switch" type="checkbox" />
+            Medlem
           </label>
-        </div>
+        </fieldset>
+        <label>
+          Antall
+          <select required name="antall">
+            {Array(4)
+              .fill(0)
+              .map((_, i) => (
+                <option key={i + 1} value={i + 1}>
+                  {i + 1}
+                </option>
+              ))}
+          </select>
+        </label>
 
         <div className="grid">
           <label>

@@ -1,5 +1,7 @@
 import playwright from "playwright";
 import { z } from "zod";
+import type { Ukedag } from "~/utils";
+import { ukedagToDate } from "~/utils";
 
 const stedToStedId: Record<OrderInfo["sted"], string> = {
   sukkerbiten: "184637%27,184637)",
@@ -30,28 +32,7 @@ export const orderInfoSchema = z.object({
         "neste-søndag",
       ])
       .transform((value) => {
-        // https://www.mywebtuts.com/blog/how-to-get-next-sunday-date-in-javascript
-        function nextDate(dayIndex: number) {
-          const today = new Date();
-          today.setDate(
-            today.getDate() + ((7 - today.getDay() + dayIndex) % 7 || 7)
-          );
-          // HACK
-          today.setHours(6);
-          return today;
-        }
-
-        const nextDayToDayIndex: Record<typeof value, number> = {
-          "neste-mandag": 1,
-          "neste-tirsdag": 2,
-          "neste-onsdag": 3,
-          "neste-torsdag": 4,
-          "neste-fredag": 5,
-          "neste-lørdag": 6,
-          "neste-søndag": 0,
-        };
-
-        return nextDate(nextDayToDayIndex[value]).toISOString().split("T")[0];
+        return ukedagToDate(value.split("-")[0] as Ukedag);
       }),
     z.string().regex(/\d{4}-[01]\d-[0-3]\d/),
   ]),
@@ -72,6 +53,7 @@ export const orderInfoSchema = z.object({
     (value) => (value === "on" ? true : undefined),
     z.boolean().default(false)
   ),
+  password: z.string().nonempty(),
 });
 type OrderInfo = z.infer<typeof orderInfoSchema>;
 
@@ -82,7 +64,14 @@ export async function placeOrder(
   orderInfo: OrderInfo,
   log: (obj: { event?: string; data: string }) => void
 ) {
-  log({ data: `🤖 Ordering with info: ${JSON.stringify(orderInfo, null, 2)}` });
+  if (orderInfo.password !== process.env.PASSWORD) {
+    log({ data: `❌ WRONG PASSWORD ❌` });
+    return;
+  }
+
+  log({
+    data: `🤖 Ordering with info: ${JSON.stringify(orderInfo, null, 2)}`,
+  });
 
   const browser = await playwright.chromium.launch({
     headless: !orderInfo.debug,
@@ -207,3 +196,14 @@ export async function placeOrder(
 //     await Promise.all(options.map((option) => option.getAttribute("value")))
 //   ).filter((sted) => sted !== "none");
 // }
+
+const envVariables = z.object({
+  PASSWORD: z.string().nonempty(),
+});
+envVariables.parse(process.env);
+
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv extends z.infer<typeof envVariables> {}
+  }
+}
