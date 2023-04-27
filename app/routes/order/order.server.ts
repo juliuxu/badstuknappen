@@ -184,7 +184,7 @@ export async function placeOrder(
     .textContent();
   log({ data: `💸 vippps: ${vippsOrderLine}` });
 
-  return;
+  return await cleanup();
 
   // Click Vipps next button
   // Number is autofilled
@@ -196,7 +196,7 @@ export async function placeOrder(
   await page.waitForLoadState();
   log({ data: "got load state" });
 
-  await cleanup();
+  return await cleanup();
 }
 
 // Password
