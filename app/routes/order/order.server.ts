@@ -174,11 +174,18 @@ export async function placeOrder(
   // Request payment
   log({ data: `🤘 go to Vipps` });
   await page.locator("#vippsContinueBtn").click();
+
+  const vippsOrderLine = await page
+    .locator("main .description")
+    .first()
+    .textContent();
+  log({ data: `💸 vippps: ${vippsOrderLine}` });
+
   return;
 
   // Click Vipps next button
   // Number is autofilled
-  log({ data: `💰 clicking final Vipps button` });
+  log({ data: `🤘 clicking final Vipps button` });
   await page.locator(".primary-button").click();
 
   log({ data: `⏳ waiting for payment in Vipps app` });

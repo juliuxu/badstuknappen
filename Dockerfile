@@ -3,9 +3,6 @@
 ARG NODE_VERSION=18
 FROM node:${NODE_VERSION}-slim as base
 
-# Install playwright browser
-RUN npx playwright install --with-deps chromium
-
 # Remix app lives here
 WORKDIR /app
 
@@ -35,6 +32,9 @@ FROM base
 
 # Copy built application
 COPY --from=build /app /app
+
+# Install playwright browser
+RUN npx playwright install --with-deps chromium
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000

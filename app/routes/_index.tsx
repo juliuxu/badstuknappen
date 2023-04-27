@@ -37,7 +37,9 @@ export default function Component() {
           <pre>
             <code>{url}</code>
           </pre>
-          <a href={url}>{url}</a>
+          <a href={url} target="_blank" rel="noreferrer">
+            {url}
+          </a>
         </>
       )}
 
