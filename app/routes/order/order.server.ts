@@ -36,10 +36,8 @@ export const orderInfoSchema = z.object({
           today.setDate(
             today.getDate() + ((7 - today.getDay() + dayIndex) % 7 || 7)
           );
-
           // HACK
           today.setHours(6);
-
           return today;
         }
 
@@ -52,12 +50,6 @@ export const orderInfoSchema = z.object({
           "neste-lørdag": 6,
           "neste-søndag": 0,
         };
-
-        console.log("⏰", nextDate(nextDayToDayIndex[value]).toDateString());
-        console.log(
-          "⏰",
-          nextDate(nextDayToDayIndex[value]).toISOString().split("T")[0]
-        );
 
         return nextDate(nextDayToDayIndex[value]).toISOString().split("T")[0];
       }),
@@ -76,21 +68,49 @@ export const orderInfoSchema = z.object({
   epost: z.string(),
   mobil: z.string(),
 
-  debug: z.boolean().default(false),
+  debug: z.preprocess(
+    (value) => (value === "on" ? true : undefined),
+    z.boolean().default(false)
+  ),
 });
 type OrderInfo = z.infer<typeof orderInfoSchema>;
-export async function placeOrder(orderInfo: OrderInfo) {
+
+export const getOrderInfo = (fromUrl: string) =>
+  orderInfoSchema.parse(Object.fromEntries(new URL(fromUrl).searchParams));
+
+export async function placeOrder(
+  orderInfo: OrderInfo,
+  log: (obj: { event?: string; data: string }) => void
+) {
+  log({ data: `🤖 Ordering with info: ${JSON.stringify(orderInfo, null, 2)}` });
+
   const browser = await playwright.chromium.launch({
     headless: !orderInfo.debug,
-    slowMo: orderInfo.debug ? 100 : undefined,
+    slowMo: orderInfo.debug ? 400 : 200,
   });
   const context = await browser.newContext();
   const page = await context.newPage();
 
+  // Cleanup function
+  async function cleanup() {
+    if (!orderInfo.debug) {
+      await page.close();
+    }
+  }
+
   // Url
   const orderUrl = buildOrderUrl(orderInfo);
-  console.log("🧭 navigating to", orderUrl);
+  log({ data: `🧭 navigating to ${orderUrl}` });
   page.goto(orderUrl);
+
+  // Assert start time is free
+  const startTimeValue = await page.locator("#start_time").inputValue();
+  if (Number(startTimeValue) !== Number(orderInfo.time)) {
+    log({
+      data: `❌ chosen time ${orderInfo.time} does not match selected start time ${startTimeValue}`,
+    });
+    return await cleanup();
+  }
 
   // Antall
   const memberSelect = page
@@ -105,19 +125,25 @@ export async function placeOrder(orderInfo: OrderInfo) {
     .first();
   const antallSelect = orderInfo.isMember ? memberSelect : nonMemberSelect;
 
-  console.log("🏃 setting antall");
+  log({ data: `🖊 setting antall to ${orderInfo.antall}` });
   await antallSelect.selectOption(String(orderInfo.antall));
 
   // Info
+  log({ data: `🖊 filling in ${orderInfo.fornavn}` });
   await page.locator("#first").fill(orderInfo.fornavn);
+  log({ data: `🖊 filling in ${orderInfo.etternavn}` });
   await page.locator("#last").fill(orderInfo.etternavn);
+  log({ data: `🖊 filling in ${orderInfo.epost}` });
   await page.locator("#email").fill(orderInfo.epost);
+  log({ data: `🖊 filling in ${orderInfo.mobil}` });
   await page.locator("#mobile_number_param").fill(orderInfo.mobil);
 
   // Accept terms
+  log({ data: `☑️ accepting terms` });
   await page.locator("#rental_prop_agreement").check();
 
   // Next
+  log({ data: `🤘 clicking submit` });
   await page.locator("#submit_button").click();
 
   // Info
@@ -128,9 +154,10 @@ export async function placeOrder(orderInfo: OrderInfo) {
       .textContent(),
     price: await page.locator(".cart-item .price").textContent(),
   };
-  console.log("🛒 shooping card", shoppingCart);
+  log({ data: `🛒 shooping card ${JSON.stringify(shoppingCart, null, 2)}` });
 
   // Confirm
+  log({ data: `🤘 clicking Bekreft/Betal` });
   await page.getByText("Bekreft/Betal").click();
 
   // Info
@@ -140,33 +167,36 @@ export async function placeOrder(orderInfo: OrderInfo) {
     time: await page.locator("tbody > tr .col_time").textContent(),
     price: await page.locator("tbody > tr .col_price").textContent(),
   };
-  console.log("📠 order line", orderLine);
+  log({ data: `📠 order line ${JSON.stringify(orderLine, null, 2)}` });
 
   // Pay
-  console.log("Betal nå");
+  log({ data: `🤘 clicking Betal nå` });
   await page.getByText("Betal nå").click();
 
   // Pay with Vipps
-  console.log("Pay with vipps");
+  log({ data: `🤘 Pay with vipps` });
   await page.locator("#paymentMethodHeading_vipps").click();
 
-  console.log("Fill number");
+  log({ data: `🖊 filling in ${orderInfo.mobil}` });
   await page.locator("#vippsPhonenumber").fill(orderInfo.mobil);
   await page.locator("#vippsPhonenumber").blur();
 
   // Request payment
-  console.log("go to Vipps!");
+  log({ data: `🤘 go to Vipps` });
   await page.locator("#vippsContinueBtn").click();
+  return;
 
   // Click Vipps next button
   // Number is autofilled
-  console.log("💰 clicking final Vipps button");
+  log({ data: `💰 clicking final Vipps button` });
   await page.locator(".primary-button").click();
 
-  if (!orderInfo.debug) page.close();
-  return {
-    data: buildOrderUrl(orderInfo),
-  };
+  log({ data: `⏳ waiting for payment in Vipps app` });
+
+  await page.waitForLoadState();
+  log({ data: "got load state" });
+
+  await cleanup();
 }
 
 // export async function getSteder(page: playwright.Page) {
