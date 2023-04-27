@@ -184,8 +184,6 @@ export async function placeOrder(
     .textContent();
   log({ data: `💸 vippps: ${vippsOrderLine}` });
 
-  return await cleanup();
-
   // Click Vipps next button
   // Number is autofilled
   log({ data: `🤘 clicking final Vipps button` });
