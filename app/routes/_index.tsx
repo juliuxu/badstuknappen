@@ -149,7 +149,12 @@ export default function Component() {
 
         <fieldset>
           <label>
-            <input name="isMember" role="switch" type="checkbox" />
+            <input
+              name="isMember"
+              role="switch"
+              type="checkbox"
+              defaultChecked
+            />
             Medlem
           </label>
         </fieldset>
