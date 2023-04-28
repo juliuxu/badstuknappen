@@ -2,7 +2,7 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "build": "remix build",
+    "build": "remix build --sourcemap",
     "dev": "run-p dev:*",
     "dev:build": "NODE_ENV=development remix dev",
     "dev:serve": "NODE_ENV=development nodemon --watch build node_modules/.bin/remix-serve build",
