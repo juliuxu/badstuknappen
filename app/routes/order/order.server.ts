@@ -97,11 +97,11 @@ export async function placeOrder(
     abortController.abort();
   }
 
-  const throwIfAborted = () => {
+  function throwIfAborted() {
     if (abortController.signal.aborted) {
       throw new Error("aborted");
     }
-  };
+  }
   async function innerPlaceOrder() {
     // Url
     const orderUrl = buildOrderUrl(orderInfo);
