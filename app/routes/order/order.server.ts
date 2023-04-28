@@ -161,7 +161,21 @@ export async function placeOrder(
         .textContent(),
       time: await page
         .locator(".cart-item .resource-contents .lead")
+        .first()
         .textContent(),
+
+      ...((await page
+        .locator(".cart-item .resource-contents .lead")
+        .nth(1)
+        .count()) === 1
+        ? {
+            amount: await page
+              .locator(".cart-item .resource-contents .lead")
+              .nth(1)
+              .textContent(),
+          }
+        : {}),
+
       price: await page.locator(".cart-item .price").textContent(),
     };
     log({ data: `🛒 shooping card ${JSON.stringify(shoppingCart)}` });
@@ -173,10 +187,10 @@ export async function placeOrder(
 
     // Info
     const orderLine = {
-      reservationId: await page.locator("tbody > tr .col_id").textContent(),
-      name: await page.locator("tbody > tr .col_id").textContent(),
-      time: await page.locator("tbody > tr .col_time").textContent(),
-      price: await page.locator("tbody > tr .col_price").textContent(),
+      reservationId: await page.locator("tbody > tr > td.col_id").textContent(),
+      name: await page.locator("tbody > tr > td.col_res").textContent(),
+      time: await page.locator("tbody > tr > td.col_time").textContent(),
+      price: await page.locator("tbody > tr > td.col_price").textContent(),
     };
     log({ data: `📠 order line ${JSON.stringify(orderLine)}` });
 
