@@ -11,7 +11,9 @@ export const loader = async ({ request }: LoaderArgs) => {
   return eventStream(abortController.signal, function setup(send) {
     console.log(`ℹ️ new order request`);
     const alsoLogOnServerSend: typeof send = ({ data, event }) => {
-      console.log(`${event ?? "message"}: ${data}`);
+      console.log(
+        `[${new Date().toISOString()}] ${event ?? "message"}: ${data}`
+      );
       send({ data, event });
     };
     placeOrder(orderInfo, alsoLogOnServerSend, abortController);
