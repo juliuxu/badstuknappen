@@ -84,8 +84,12 @@ export async function placeOrder(
   const context = await browser.newContext();
   const page = await context.newPage();
 
-  // Cleanup function
-  async function cleanup() {
+  try {
+    await innerPlaceOrder();
+  } catch (e) {
+    log({ data: `❌ got error ${e}` });
+  } finally {
+    // Cleanup
     if (!orderInfo.debug) {
       await context.close();
       await browser.close();
@@ -93,119 +97,123 @@ export async function placeOrder(
     abortController.abort();
   }
 
-  // Url
-  const orderUrl = buildOrderUrl(orderInfo);
-  log({ data: `🧭 navigating to ${orderUrl}` });
-  page.goto(orderUrl);
+  async function innerPlaceOrder() {
+    // Url
+    const orderUrl = buildOrderUrl(orderInfo);
+    log({ data: `🧭 navigating to ${orderUrl}` });
+    page.goto(orderUrl);
 
-  // Assert start time is free
-  const startTimeValue = await page.locator("#start_time").inputValue();
-  if (Number(startTimeValue) !== Number(orderInfo.time)) {
-    log({
-      data: `❌ chosen time ${orderInfo.time} does not match selected start time ${startTimeValue}`,
-    });
-    return await cleanup();
+    // Assert start time is free
+    const startTimeValue = await page.locator("#start_time").inputValue();
+    if (Number(startTimeValue) !== Number(orderInfo.time)) {
+      log({
+        data: `❌ chosen time ${orderInfo.time} does not match selected start time ${startTimeValue}`,
+      });
+      throw new Error(
+        `❌ chosen time ${orderInfo.time} does not match selected start time ${startTimeValue}`
+      );
+    }
+
+    // Antall
+    const memberSelect = page
+      .locator("#rental_prop_Antall_personer .form-group")
+      .filter({ hasText: "Medlem" })
+      .locator("select")
+      .first();
+    const nonMemberSelect = page
+      .locator("#rental_prop_Antall_personer .form-group")
+      .filter({ hasText: "ikke-medlemmer" })
+      .locator("select")
+      .first();
+    const antallSelect = orderInfo.isMember ? memberSelect : nonMemberSelect;
+
+    log({ data: `🖊 setting antall to ${orderInfo.antall}` });
+    await antallSelect.selectOption(String(orderInfo.antall));
+
+    // Info
+    log({ data: `🖊 filling in ${orderInfo.fornavn}` });
+    await page.locator("#first").fill(orderInfo.fornavn);
+    log({ data: `🖊 filling in ${orderInfo.etternavn}` });
+    await page.locator("#last").fill(orderInfo.etternavn);
+    log({ data: `🖊 filling in ${orderInfo.epost}` });
+    await page.locator("#email").fill(orderInfo.epost);
+    log({ data: `🖊 filling in ${orderInfo.mobil}` });
+    await page.locator("#mobile_number_param").fill(orderInfo.mobil);
+
+    // Accept terms
+    log({ data: `☑️ accepting terms` });
+    await page.locator("#rental_prop_agreement").check();
+
+    // Next
+    log({ data: `🤘 clicking submit` });
+    await page.locator("#submit_button").click();
+
+    // Info
+    const shoppingCart = {
+      name: await page
+        .locator(".cart-item .resource-contents h4")
+        .textContent(),
+      time: await page
+        .locator(".cart-item .resource-contents .lead")
+        .textContent(),
+      price: await page.locator(".cart-item .price").textContent(),
+    };
+    log({ data: `🛒 shooping card ${JSON.stringify(shoppingCart)}` });
+
+    // Confirm
+    log({ data: `🤘 clicking Bekreft/Betal` });
+    await page.getByText("Bekreft/Betal").click();
+
+    // Info
+    const orderLine = {
+      reservationId: await page.locator("tbody > tr .col_id").textContent(),
+      name: await page.locator("tbody > tr .col_id").textContent(),
+      time: await page.locator("tbody > tr .col_time").textContent(),
+      price: await page.locator("tbody > tr .col_price").textContent(),
+    };
+    log({ data: `📠 order line ${JSON.stringify(orderLine)}` });
+
+    // Pay
+    log({ data: `🤘 clicking Betal nå` });
+    await page.getByText("Betal nå").click();
+
+    // Pay with Vipps
+    log({ data: `🤘 Pay with vipps` });
+    await page.locator("#paymentMethodHeading_vipps").click();
+
+    log({ data: `🖊 filling in ${orderInfo.mobil}` });
+    await page.locator("#vippsPhonenumber").fill(orderInfo.mobil);
+    await page.locator("#vippsPhonenumber").blur();
+
+    // Request payment
+    log({ data: `🤘 go to Vipps` });
+    await page.locator("#vippsContinueBtn").click();
+
+    const vippsOrderLine = await page
+      .locator("main .description")
+      .first()
+      .textContent();
+    log({ data: `💸 vippps: ${vippsOrderLine}` });
+
+    // Click Vipps next button
+    // Number is autofilled
+    log({ data: `🤘 clicking final Vipps button` });
+    await page.locator(".primary-button").click();
+
+    log({ data: `⏳ waiting for payment in Vipps app` });
+
+    await page.waitForLoadState();
+    log({ data: "got load state" });
+
+    await page.waitForLoadState();
+    log({ data: "got another" });
+
+    const reservantionLine = await page
+      .locator(".rental-id")
+      .first()
+      .textContent();
+    log({ data: `✅ done: ${reservantionLine}` });
   }
-
-  // Antall
-  const memberSelect = page
-    .locator("#rental_prop_Antall_personer .form-group")
-    .filter({ hasText: "Medlem" })
-    .locator("select")
-    .first();
-  const nonMemberSelect = page
-    .locator("#rental_prop_Antall_personer .form-group")
-    .filter({ hasText: "ikke-medlemmer" })
-    .locator("select")
-    .first();
-  const antallSelect = orderInfo.isMember ? memberSelect : nonMemberSelect;
-
-  log({ data: `🖊 setting antall to ${orderInfo.antall}` });
-  await antallSelect.selectOption(String(orderInfo.antall));
-
-  // Info
-  log({ data: `🖊 filling in ${orderInfo.fornavn}` });
-  await page.locator("#first").fill(orderInfo.fornavn);
-  log({ data: `🖊 filling in ${orderInfo.etternavn}` });
-  await page.locator("#last").fill(orderInfo.etternavn);
-  log({ data: `🖊 filling in ${orderInfo.epost}` });
-  await page.locator("#email").fill(orderInfo.epost);
-  log({ data: `🖊 filling in ${orderInfo.mobil}` });
-  await page.locator("#mobile_number_param").fill(orderInfo.mobil);
-
-  // Accept terms
-  log({ data: `☑️ accepting terms` });
-  await page.locator("#rental_prop_agreement").check();
-
-  // Next
-  log({ data: `🤘 clicking submit` });
-  await page.locator("#submit_button").click();
-
-  // Info
-  const shoppingCart = {
-    name: await page.locator(".cart-item .resource-contents h4").textContent(),
-    time: await page
-      .locator(".cart-item .resource-contents .lead")
-      .textContent(),
-    price: await page.locator(".cart-item .price").textContent(),
-  };
-  log({ data: `🛒 shooping card ${JSON.stringify(shoppingCart)}` });
-
-  // Confirm
-  log({ data: `🤘 clicking Bekreft/Betal` });
-  await page.getByText("Bekreft/Betal").click();
-
-  // Info
-  const orderLine = {
-    reservationId: await page.locator("tbody > tr .col_id").textContent(),
-    name: await page.locator("tbody > tr .col_id").textContent(),
-    time: await page.locator("tbody > tr .col_time").textContent(),
-    price: await page.locator("tbody > tr .col_price").textContent(),
-  };
-  log({ data: `📠 order line ${JSON.stringify(orderLine)}` });
-
-  // Pay
-  log({ data: `🤘 clicking Betal nå` });
-  await page.getByText("Betal nå").click();
-
-  // Pay with Vipps
-  log({ data: `🤘 Pay with vipps` });
-  await page.locator("#paymentMethodHeading_vipps").click();
-
-  log({ data: `🖊 filling in ${orderInfo.mobil}` });
-  await page.locator("#vippsPhonenumber").fill(orderInfo.mobil);
-  await page.locator("#vippsPhonenumber").blur();
-
-  // Request payment
-  log({ data: `🤘 go to Vipps` });
-  await page.locator("#vippsContinueBtn").click();
-
-  const vippsOrderLine = await page
-    .locator("main .description")
-    .first()
-    .textContent();
-  log({ data: `💸 vippps: ${vippsOrderLine}` });
-
-  // Click Vipps next button
-  // Number is autofilled
-  log({ data: `🤘 clicking final Vipps button` });
-  await page.locator(".primary-button").click();
-
-  log({ data: `⏳ waiting for payment in Vipps app` });
-
-  await page.waitForLoadState();
-  log({ data: "got load state" });
-
-  await page.waitForLoadState();
-  log({ data: "got another" });
-
-  const reservantionLine = await page
-    .locator(".rental-id")
-    .first()
-    .textContent();
-  log({ data: `✅ done: ${reservantionLine}` });
-
-  return await cleanup();
 }
 
 // Password
