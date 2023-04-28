@@ -205,9 +205,6 @@ export async function placeOrder(
     await page.waitForLoadState();
     log({ data: "got load state" });
 
-    await page.waitForLoadState();
-    log({ data: "got another" });
-
     const reservantionLine = await page
       .locator(".rental-id")
       .first()
