@@ -97,6 +97,11 @@ export async function placeOrder(
     abortController.abort();
   }
 
+  const throwIfAborted = () => {
+    if (abortController.signal.aborted) {
+      throw new Error("aborted");
+    }
+  };
   async function innerPlaceOrder() {
     // Url
     const orderUrl = buildOrderUrl(orderInfo);
@@ -145,6 +150,7 @@ export async function placeOrder(
     await page.locator("#rental_prop_agreement").check();
 
     // Next
+    throwIfAborted();
     log({ data: `🤘 clicking submit` });
     await page.locator("#submit_button").click();
 
@@ -161,6 +167,7 @@ export async function placeOrder(
     log({ data: `🛒 shooping card ${JSON.stringify(shoppingCart)}` });
 
     // Confirm
+    throwIfAborted();
     log({ data: `🤘 clicking Bekreft/Betal` });
     await page.getByText("Bekreft/Betal").click();
 
@@ -174,10 +181,12 @@ export async function placeOrder(
     log({ data: `📠 order line ${JSON.stringify(orderLine)}` });
 
     // Pay
+    throwIfAborted();
     log({ data: `🤘 clicking Betal nå` });
     await page.getByText("Betal nå").click();
 
     // Pay with Vipps
+    throwIfAborted();
     log({ data: `🤘 Pay with vipps` });
     await page.locator("#paymentMethodHeading_vipps").click();
 
@@ -186,6 +195,7 @@ export async function placeOrder(
     await page.locator("#vippsPhonenumber").blur();
 
     // Request payment
+    throwIfAborted();
     log({ data: `🤘 go to Vipps` });
     await page.locator("#vippsContinueBtn").click();
 
@@ -197,6 +207,7 @@ export async function placeOrder(
 
     // Click Vipps next button
     // Number is autofilled
+    throwIfAborted();
     log({ data: `🤘 clicking final Vipps button` });
     await page.locator(".primary-button").click();
 
@@ -205,6 +216,7 @@ export async function placeOrder(
     await page.waitForLoadState();
     log({ data: "got load state" });
 
+    throwIfAborted();
     const reservantionLine = await page
       .locator(".rental-id")
       .first()
