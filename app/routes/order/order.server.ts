@@ -79,6 +79,7 @@ export async function placeOrder(
   const browser = await playwright.chromium.launch({
     headless: !orderInfo.debug,
     slowMo: orderInfo.debug ? 400 : 200,
+    timeout: 120,
   });
   const context = await browser.newContext();
   const page = await context.newPage();
@@ -86,6 +87,7 @@ export async function placeOrder(
   // Cleanup function
   async function cleanup() {
     if (!orderInfo.debug) {
+      await context.close();
       await browser.close();
     }
     abortController.abort();
