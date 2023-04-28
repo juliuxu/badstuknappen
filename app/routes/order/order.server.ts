@@ -79,10 +79,10 @@ export async function placeOrder(
   const browser = await playwright.chromium.launch({
     headless: !orderInfo.debug,
     slowMo: orderInfo.debug ? 400 : 200,
-    timeout: 120,
   });
   const context = await browser.newContext();
   const page = await context.newPage();
+  page.setDefaultTimeout(120 * 1000);
 
   try {
     await innerPlaceOrder();
