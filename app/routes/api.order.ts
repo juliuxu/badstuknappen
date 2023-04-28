@@ -14,7 +14,9 @@ export const loader = async ({ request }: LoaderArgs) => {
       console.log(
         `[${new Date().toISOString()}] ${event ?? "message"}: ${data}`
       );
-      send({ data, event });
+      if (!abortController.signal.aborted) {
+        send({ data, event });
+      }
     };
     placeOrder(orderInfo, alsoLogOnServerSend, abortController);
     return function clear() {};
