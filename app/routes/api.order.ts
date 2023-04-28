@@ -9,7 +9,7 @@ export const loader = async ({ request }: LoaderArgs) => {
   request.signal.addEventListener("abort", () => abortController.abort());
 
   return eventStream(abortController.signal, function setup(send) {
-    console.log(`ℹ️ new order request`);
+    console.log("ℹ️ new order request");
     const alsoLogOnServerSend: typeof send = ({ data, event }) => {
       console.log(
         `[${new Date().toISOString()}] ${event ?? "message"}: ${data}`
@@ -19,6 +19,8 @@ export const loader = async ({ request }: LoaderArgs) => {
       }
     };
     placeOrder(orderInfo, alsoLogOnServerSend, abortController);
-    return function clear() {};
+    return function clear() {
+      console.log("ℹ️ order request done");
+    };
   });
 };
