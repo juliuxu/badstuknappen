@@ -194,6 +194,12 @@ export async function placeOrder(
   await page.waitForLoadState();
   log({ data: "got load state" });
 
+  await page.waitForLoadState();
+  log({ data: "got another load state" });
+
+  await page.waitForLoadState();
+  log({ data: "got another load state" });
+
   return await cleanup();
 }
 
