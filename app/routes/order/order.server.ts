@@ -194,11 +194,11 @@ export async function placeOrder(
   await page.waitForLoadState();
   log({ data: "got load state" });
 
-  await page.waitForLoadState();
-  log({ data: "got another load state" });
-
-  await page.waitForLoadState();
-  log({ data: "got another load state" });
+  const reservantionLine = await page
+    .locator(".rental-id")
+    .first()
+    .textContent();
+  log({ data: `✅ done: ${reservantionLine}` });
 
   return await cleanup();
 }
