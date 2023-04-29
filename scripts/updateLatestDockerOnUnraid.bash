@@ -8,7 +8,7 @@ COOKIE_JAR=$(mktemp)
 [[ -z "${UNRAID_USERNAME}" ]] && echo "❌ Environment variable UNRAID_USERNAME is missing" && exit 1
 [[ -z "${UNRAID_PASSWORD}" ]] && echo "❌ Environment variable UNRAID_PASSWORD is missing" && exit 1
 
-echo "Login to unraid"
+echo "🔐 Login to unraid"
 RES=$(curl -i "https://unraid.julianjark.no/login" \
   --user "$UNRAID_HTTP_USERNAME:$UNRAID_HTTP_PASSWORD" \
   --cookie-jar "$COOKIE_JAR" \
