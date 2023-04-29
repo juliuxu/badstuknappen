@@ -36,6 +36,10 @@ COPY --from=build /app /app
 # Install playwright browser
 RUN npx playwright install --with-deps chromium
 
+# Ensure correct timezone
+RUN apt update && apt install tzdata -y
+ENV TZ="Europe/Oslo"
+
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
 CMD [ "npm", "run", "start" ]
