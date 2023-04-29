@@ -1,6 +1,6 @@
 // https://stackoverflow.com/questions/1579010/get-next-date-from-weekday-in-javascript
-function nextDate(dayIndex: number) {
-  const date = new Date();
+function nextDate(dayIndex: number, fromDate: Date) {
+  const date = new Date(fromDate);
   date.setDate(date.getDate() + ((dayIndex + (7 - date.getDay())) % 7));
   return date;
 }
@@ -16,7 +16,7 @@ export const ukedager = [
 ] as const;
 export type Ukedag = typeof ukedager[number];
 
-export function nesteUkedagToDate(value: Ukedag) {
+export function nesteUkedagToDate(value: Ukedag, fromDate = new Date()) {
   const dayToDayIndex: Record<Ukedag, number> = {
     mandag: 1,
     tirsdag: 2,
@@ -26,14 +26,20 @@ export function nesteUkedagToDate(value: Ukedag) {
     lørdag: 6,
     søndag: 0,
   };
-  console.log(
-    `nesteUkedagToDate: ${nextDate(dayToDayIndex[value]).toDateString()}`
-  );
   if (dayToDayIndex[value] === undefined) {
     throw new Error(`invalid ukedag ${value}`);
   }
 
-  return nextDate(dayToDayIndex[value]).toISOString().split("T")[0];
+  const date = nextDate(dayToDayIndex[value], fromDate);
+
+  // Format the date, like so 2023-05-03
+  // Using the system timezone
+  // using `toISOString` causes the timezone to be different
+  // resulting in wrong dates when the time is right after midnight (local time)
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
 // export async function getSteder(page: playwright.Page) {
