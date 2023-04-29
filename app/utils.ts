@@ -1,6 +1,12 @@
 // https://stackoverflow.com/questions/1579010/get-next-date-from-weekday-in-javascript
 function nextDate(dayIndex: number, fromDate: Date) {
   const date = new Date(fromDate);
+
+  // Lock the time to the middle of the day to try to ensure no silly-ness with
+  // daylight savings time changes
+  // hopefully this does not cause more problems than it tries to solve
+  date.setHours(12, 0);
+
   date.setDate(date.getDate() + ((dayIndex + (7 - date.getDay())) % 7));
   return date;
 }
