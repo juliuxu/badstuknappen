@@ -24,7 +24,7 @@ if [[ $RES != */Main ]]; then
 fi
 
 
-echo "Trigger docker update"
+echo "🤖 Trigger docker update"
 RES=$(curl "https://unraid.julianjark.no/plugins/dynamix.docker.manager/include/CreateDocker.php?updateContainer=true&ct[]=$CONTAINER_NAME" \
   --user "$UNRAID_HTTP_USERNAME:$UNRAID_HTTP_PASSWORD" \
   --cookie "$COOKIE_JAR" \
