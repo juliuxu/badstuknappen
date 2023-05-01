@@ -5,9 +5,9 @@ function nextDate(dayIndex: number, fromDate: Date) {
   // Lock the time to the middle of the day to try to ensure no silly-ness with
   // daylight savings time changes
   // hopefully this does not cause more problems than it tries to solve
-  date.setHours(12, 0);
+  date.setHours(12);
 
-  date.setDate(date.getDate() + ((dayIndex + (7 - date.getDay())) % 7));
+  date.setDate(date.getDate() + ((dayIndex + (7 - date.getDay())) % 7 || 7));
   return date;
 }
 
