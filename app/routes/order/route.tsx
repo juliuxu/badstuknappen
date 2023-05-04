@@ -1,6 +1,6 @@
 import type { V2_MetaFunction } from "@remix-run/node";
 import { useSearchParams } from "@remix-run/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const title = "🧖 Bestill Badstue 🌊";
 export const meta: V2_MetaFunction = () => {
@@ -57,7 +57,7 @@ export default function Component() {
         {isOrdering && (
           <pre
             style={{
-              aspectRatio: "1 / 0.7",
+              aspectRatio: "1 / 1",
               width: "100%",
               maxHeight: "70vh",
             }}
