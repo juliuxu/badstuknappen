@@ -42,7 +42,6 @@ export default function Component() {
   return (
     <main className="container">
       <h1>{title}</h1>
-      <p></p>
 
       {url && (
         <>
@@ -197,6 +196,14 @@ export default function Component() {
             <label>
               <input name="debug" role="switch" type="checkbox" />
               Debug
+            </label>
+          </fieldset>
+        )}
+        {isLocal && (
+          <fieldset>
+            <label>
+              <input name="useMock" role="switch" type="checkbox" />
+              Use mock
             </label>
           </fieldset>
         )}

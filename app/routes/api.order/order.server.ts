@@ -1,7 +1,5 @@
 import playwright from "playwright";
-import { z } from "zod";
-import type { Ukedag } from "~/utils";
-import { nesteUkedagToDate } from "~/utils";
+import type { OrderInfo } from "./schema";
 
 const stedToStedId: Record<OrderInfo["sted"], string> = {
   sukkerbiten: "184637%27,184637)",
@@ -13,52 +11,10 @@ interface OrderUrlInfo {
   date: string; // "05.05.2023"
   time: string; // "07"
 }
-const buildOrderUrl = ({ sted, date, time }: OrderUrlInfo) => {
+export const buildOrderUrl = ({ sted, date, time }: OrderUrlInfo) => {
   const stedId = stedToStedId[sted];
   return `https://www.planyo.com/booking.php?planyo_lang=NO&mode=reserve&prefill=true&one_date=${date}&start_date=${date}&start_time=${time}&resource_id=${stedId}`;
 };
-
-export const orderInfoSchema = z.object({
-  sted: z.enum(["sukkerbiten", "langkaia"]),
-  date: z.union([
-    z
-      .enum([
-        "neste-mandag",
-        "neste-tirsdag",
-        "neste-onsdag",
-        "neste-torsdag",
-        "neste-fredag",
-        "neste-lørdag",
-        "neste-søndag",
-      ])
-      .transform((value) => {
-        return nesteUkedagToDate(value.split("-")[1] as Ukedag);
-      }),
-    z.string().regex(/\d{4}-[01]\d-[0-3]\d/),
-  ]),
-  time: z.string(),
-  antall: z.coerce.number().min(1).max(4).default(1),
-
-  isMember: z.preprocess(
-    (value) => (value === "on" ? true : undefined),
-    z.boolean().default(false)
-  ),
-
-  fornavn: z.string(),
-  etternavn: z.string(),
-  epost: z.string(),
-  mobil: z.string(),
-
-  debug: z.preprocess(
-    (value) => (value === "on" ? true : undefined),
-    z.boolean().default(false)
-  ),
-  password: z.string().nonempty(),
-});
-type OrderInfo = z.infer<typeof orderInfoSchema>;
-
-export const getOrderInfo = (fromUrl: string) =>
-  orderInfoSchema.parse(Object.fromEntries(new URL(fromUrl).searchParams));
 
 export async function placeOrder(
   orderInfo: OrderInfo,
@@ -236,17 +192,5 @@ export async function placeOrder(
       .first()
       .textContent();
     log({ data: `✅ done: ${reservantionLine}` });
-  }
-}
-
-// Password
-const envVariables = z.object({
-  PASSWORD: z.string().nonempty(),
-});
-envVariables.parse(process.env);
-
-declare global {
-  namespace NodeJS {
-    interface ProcessEnv extends z.infer<typeof envVariables> {}
   }
 }

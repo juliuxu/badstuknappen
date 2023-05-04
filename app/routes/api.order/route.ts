@@ -1,6 +1,8 @@
 import type { LoaderArgs } from "@remix-run/node";
-import { getOrderInfo, placeOrder } from "./order/order.server";
+import { placeOrder } from "./order.server";
 import { eventStream } from "remix-utils";
+import { getOrderInfo } from "./schema";
+import { mockPlaceOrder } from "./mock-order.server";
 
 export const loader = async ({ request }: LoaderArgs) => {
   const orderInfo = getOrderInfo(request.url);
@@ -18,7 +20,11 @@ export const loader = async ({ request }: LoaderArgs) => {
         send({ data, event });
       }
     };
-    placeOrder(orderInfo, alsoLogOnServerSend, abortController);
+    if (orderInfo.useMock) {
+      mockPlaceOrder(orderInfo, alsoLogOnServerSend, abortController);
+    } else {
+      placeOrder(orderInfo, alsoLogOnServerSend, abortController);
+    }
     return function clear() {
       console.log("ℹ️ order request done");
     };
