@@ -183,8 +183,8 @@ export async function placeOrder(
 
     log({ data: `⏳ waiting for payment in Vipps app` });
 
+    throwIfAborted();
     await page.waitForLoadState();
-    log({ data: "got load state" });
 
     throwIfAborted();
     const reservantionLine = await page

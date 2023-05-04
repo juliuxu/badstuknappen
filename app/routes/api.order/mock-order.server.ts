@@ -74,9 +74,6 @@ export const mockPlaceOrder: typeof placeOrder = async (
   await sleep(300);
   log({ data: `⏳ waiting for payment in Vipps app` });
 
-  await sleep(300);
-  log({ data: "got load state" });
-
   await sleep(2000);
   log({ data: `✅ done: ${"MOCK"}` });
 
