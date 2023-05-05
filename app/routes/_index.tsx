@@ -4,7 +4,7 @@ import { useLoaderData, useSearchParams } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { nesteUkedagToDate, ukedager } from "~/utils";
 
-const title = "Super Badstue Bestiller";
+const title = "Badstuknappen";
 export const meta: V2_MetaFunction = () => {
   return [{ title }];
 };

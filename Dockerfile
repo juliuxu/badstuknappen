@@ -45,4 +45,4 @@ EXPOSE 3000
 CMD [ "npm", "run", "start" ]
 
 # Build and push with
-# docker buildx build --tag ghcr.io/juliuxu/super-badstue --platform=linux/arm64,linux/amd64 . --push
+# docker buildx build --tag ghcr.io/juliuxu/badstuknappen --platform=linux/arm64,linux/amd64 . --push
