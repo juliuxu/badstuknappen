@@ -16,7 +16,7 @@ Bestill badstubesøk med så få steg som mulig
 - Bygget med [Remix](https://remix.run/)
 - Automatisering med [Playwright](https://playwright.dev/)
 - Styling med [Pico.css](https://picocss.com/)
-- Kontainer [Docker](https://www.docker.com/)
+- Kontainer i [Docker](https://www.docker.com/)
 - Hjemmehosting med [unRaid](https://unraid.net/)
 
 ## Utvikling
