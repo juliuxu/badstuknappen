@@ -9,7 +9,7 @@ Bestill badstubesøk med så få steg som mulig
 1. Fyll inn informasjonen din
 2. Klikk bestill
 3. Vent på betalingsvarsel fra Vipps og godta
-4. Slapp av, og møt opp på badstuen 🧘
+4. Slapp av, og møt opp i badstuen 🧘
 
 ## Tech stack
 
