@@ -2,6 +2,7 @@ import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData, useSearchParams } from "@remix-run/react";
 import { useState } from "react";
+import aerefuglSound from "~/aerefugl-oh.mp3";
 import { getOrderInfo } from "../api.order/schema";
 
 const title = "🧖 Bestill Badstue 🌊";
@@ -25,7 +26,17 @@ export default function Component() {
   const [isOrdering, setIsOrdering] = useState(false);
   const [eventLog, setEventLog] = useState<EventType[]>([]);
 
+  // Play the sound of the Ærefugl when ordering
+  const [sound] = useState(() => {
+    if (typeof window === "undefined") return undefined;
+    const sound = new Audio(aerefuglSound);
+    sound.preload = "auto";
+    return sound;
+  });
+
   const order = () => {
+    sound?.play();
+
     setIsOrdering(true);
     setEventLog([]);
     const eventSource = new EventSource(relativeUrl);
