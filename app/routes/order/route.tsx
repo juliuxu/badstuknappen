@@ -86,6 +86,31 @@ export default function Component() {
         <time>{shortTimeToClockTime(orderInfo.time)}</time>{" "}
         <time>{formatter.format(new Date(orderInfo.date))}</time>
       </p>
+
+      {orderInfo.useMock && (
+        <p
+          style={{
+            border: "4px solid hsl(142, 81%, 50%)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 16,
+          }}
+        >
+          <div style={{ textAlign: "center" }}>
+            <div
+              style={{
+                fontSize: "1.5rem",
+                fontWeight: "bold",
+              }}
+            >
+              🧪 Mock mode 🧪
+            </div>
+            <i>Simulert bestilling for bruk under testing</i>
+          </div>
+        </p>
+      )}
+
       <div>
         {!isOrdering && (
           <button
