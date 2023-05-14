@@ -43,8 +43,6 @@ export default function Component() {
 
   return (
     <main className="container">
-      <h1>{title}</h1>
-
       {url && (
         <>
           <hgroup>
