@@ -23,7 +23,7 @@ export const ukedager = [
 export type Ukedag = typeof ukedager[number];
 
 export function nesteUkedagToDate(value: Ukedag, fromDate = new Date()) {
-  const dayToDayIndex: Record<Ukedag, number> = {
+  const ukedagToDayIndex: Record<Ukedag, number> = {
     mandag: 1,
     tirsdag: 2,
     onsdag: 3,
@@ -32,11 +32,11 @@ export function nesteUkedagToDate(value: Ukedag, fromDate = new Date()) {
     lørdag: 6,
     søndag: 0,
   };
-  if (dayToDayIndex[value] === undefined) {
+  if (ukedagToDayIndex[value] === undefined) {
     throw new Error(`invalid ukedag ${value}`);
   }
 
-  const date = nextDate(dayToDayIndex[value], fromDate);
+  const date = nextDate(ukedagToDayIndex[value], fromDate);
 
   // Format the date, like so 2023-05-03
   // Using the system timezone
