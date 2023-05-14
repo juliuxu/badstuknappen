@@ -2,8 +2,9 @@ import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData, useSearchParams } from "@remix-run/react";
 import { useState } from "react";
-import aerfuglSound from "~/aerfugl-oh.mp3";
+import aerfuglSound from "~/assets/aerfugl-oh.mp3";
 import { getOrderInfo } from "../api.order/schema";
+import { requirePassword } from "../login/route";
 
 const title = "🧖 Bestill Badstue 🌊";
 export const meta: V2_MetaFunction = () => {
@@ -11,6 +12,7 @@ export const meta: V2_MetaFunction = () => {
 };
 
 export const loader = ({ request }: LoaderArgs) => {
+  requirePassword(request);
   const orderInfo = getOrderInfo(request.url);
   return json({ orderInfo });
 };

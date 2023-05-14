@@ -6,6 +6,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import picoCss from "@picocss/pico/css/pico.min.css";
 
 export default function App() {
   return (
@@ -14,11 +15,7 @@ export default function App() {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-        {/* <link rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css" /> */}
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css"
-        />
+        <link rel="stylesheet" href={picoCss} />
         <style
           dangerouslySetInnerHTML={{
             __html: `        
@@ -35,6 +32,15 @@ export default function App() {
         <Links />
       </head>
       <body>
+        <nav className="container-fluid">
+          <ul>
+            <li>
+              <a href="/" className="contrast">
+                <strong>Badstuknappen</strong>
+              </a>
+            </li>
+          </ul>
+        </nav>
         <Outlet />
         <ScrollRestoration />
         <Scripts />

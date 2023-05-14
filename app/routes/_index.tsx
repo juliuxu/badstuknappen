@@ -3,6 +3,7 @@ import { json } from "@remix-run/node";
 import { useLoaderData, useSearchParams } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { nesteUkedagToDate, ukedager } from "~/utils";
+import { requirePassword } from "./login/route";
 
 const title = "Badstuknappen";
 export const meta: V2_MetaFunction = () => {
@@ -10,6 +11,7 @@ export const meta: V2_MetaFunction = () => {
 };
 
 export const loader = ({ request }: LoaderArgs) => {
+  requirePassword(request);
   const url = new URL(request.url);
   return json({
     isLocal:

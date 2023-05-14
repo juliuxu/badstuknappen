@@ -8,6 +8,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@picocss/pico": "1.5.10",
     "@remix-run/node": "1.16.0",
     "@remix-run/react": "1.16.0",
     "@remix-run/serve": "1.16.0",

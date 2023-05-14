@@ -3,8 +3,10 @@ import { placeOrder } from "./order.server";
 import { eventStream } from "remix-utils";
 import { getOrderInfo } from "./schema";
 import { mockPlaceOrder } from "./mock-order.server";
+import { requirePassword } from "../login/route";
 
 export const loader = async ({ request }: LoaderArgs) => {
+  requirePassword(request);
   const orderInfo = getOrderInfo(request.url);
 
   const abortController = new AbortController();

@@ -1,0 +1,18 @@
+article {
+  padding: 0;
+}
+article > div {
+  padding: 3rem;
+}
+
+img {
+  object-fit: cover;
+  object-position: center;
+  height: 100%;
+}
+
+@media screen and (max-width: 768px) {
+  img {
+    display: none;
+  }
+}
