@@ -3,7 +3,7 @@ import { json } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { useActionData, useSearchParams } from "@remix-run/react";
 import crypto from "crypto";
-import saunaImg from "~/assets/DALL·E 2023-05-14 21.19.43 - a sauna by the oslofjord, synthwave style, 2d digital vector art.png";
+import saunaImg from "~/assets/DALL·E 2023-05-14 21.19.43 - a sauna by the oslofjord, synthwave style, 2d digital vector art.webp";
 import style from "./style.css";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: style }];
