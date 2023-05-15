@@ -1,7 +1,9 @@
+import { useState } from "react";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData, useSearchParams } from "@remix-run/react";
-import { useState } from "react";
+import confetti from "canvas-confetti";
+
 import aerfuglSound from "~/assets/aerfugl-oh.mp3";
 import { getOrderInfo } from "../api.order/schema";
 import { requirePassword } from "../login/route";
@@ -28,7 +30,7 @@ export default function Component() {
   const [isOrdering, setIsOrdering] = useState(false);
   const [eventLog, setEventLog] = useState<EventType[]>([]);
 
-  // Play the sound of the Ærefugl when ordering
+  // Play the sound of the Ærfugl when ordering
   const [sound] = useState(() => {
     if (typeof window === "undefined") return undefined;
     const sound = new Audio(aerfuglSound);
@@ -46,6 +48,12 @@ export default function Component() {
       eventSource.close();
     });
     eventSource.addEventListener("message", (message) => {
+      if (message.data.includes("✅ done")) {
+        setTimeout(showConfetti, 200);
+        setTimeout(showConfetti, 600);
+        setTimeout(showConfetti, 800);
+      }
+
       setEventLog((currentEventLog) => [
         { data: message.data, time: new Date().toISOString() },
         ...currentEventLog,
@@ -120,7 +128,7 @@ export default function Component() {
             style={{
               aspectRatio: "1 / 0.7",
               width: "100%",
-              maxHeight: "70vh",
+              maxHeight: "60vh",
             }}
           >
             Bestill
@@ -132,7 +140,7 @@ export default function Component() {
             style={{
               aspectRatio: "1 / 1",
               width: "100%",
-              maxHeight: "70vh",
+              maxHeight: "60vh",
             }}
           >
             <code
@@ -153,4 +161,43 @@ export default function Component() {
       </div>
     </main>
   );
+}
+
+// Show confetti when ordering is done
+async function showConfetti() {
+  const count = 200;
+  const defaults = {
+    origin: { y: 0.7 },
+  };
+
+  function fire(particleRatio: number, opts: Parameters<typeof confetti>[0]) {
+    confetti(
+      Object.assign({}, defaults, opts, {
+        particleCount: Math.floor(count * particleRatio),
+      })
+    );
+  }
+
+  fire(0.25, {
+    spread: 26,
+    startVelocity: 55,
+  });
+  fire(0.2, {
+    spread: 60,
+  });
+  fire(0.35, {
+    spread: 100,
+    decay: 0.91,
+    scalar: 0.8,
+  });
+  fire(0.1, {
+    spread: 120,
+    startVelocity: 25,
+    decay: 0.92,
+    scalar: 1.2,
+  });
+  fire(0.1, {
+    spread: 120,
+    startVelocity: 45,
+  });
 }
