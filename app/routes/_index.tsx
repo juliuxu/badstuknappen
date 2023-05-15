@@ -66,7 +66,7 @@ export default function Component() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  badstu timer ↗
+                  badstutimer ↗
                 </a>
               </small>
             </label>
