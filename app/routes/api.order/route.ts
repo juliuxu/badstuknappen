@@ -1,7 +1,7 @@
 import type { LoaderArgs } from "@remix-run/node";
 import { placeOrder } from "./order.server";
 import { eventStream } from "remix-utils";
-import { getOrderInfo } from "./schema";
+import { getOrderInfo } from "./schema.server";
 import { mockPlaceOrder } from "./mock-order.server";
 import { requirePassword } from "../login/route";
 

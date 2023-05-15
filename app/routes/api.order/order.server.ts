@@ -1,5 +1,6 @@
 import playwright from "playwright";
-import type { OrderInfo } from "./schema";
+import type { OrderInfo } from "./schema.server";
+import { OrderStatus } from "./order-status";
 
 const stedToStedId: Record<OrderInfo["sted"], string> = {
   sukkerbiten: "184637%27,184637)",
@@ -61,6 +62,8 @@ export async function placeOrder(
   async function innerPlaceOrder() {
     // Url
     const orderUrl = buildOrderUrl(orderInfo);
+
+    log({ event: "status", data: OrderStatus.PENDING });
     log({ data: `🧭 navigating to ${orderUrl}` });
     page.goto(orderUrl);
 
@@ -74,6 +77,8 @@ export async function placeOrder(
         `❌ chosen time ${orderInfo.time} does not match selected start time ${startTimeValue}`
       );
     }
+
+    log({ event: "status", data: OrderStatus.ENTERING_INFO });
 
     // Antall
     const memberSelect = page
@@ -104,6 +109,8 @@ export async function placeOrder(
     // Accept terms
     log({ data: `☑️ accepting terms` });
     await page.locator("#rental_prop_agreement").check();
+
+    log({ event: "status", data: OrderStatus.CLICKING_BUTTONS });
 
     // Next
     throwIfAborted();
@@ -151,6 +158,8 @@ export async function placeOrder(
     log({ data: `📠 order line ${JSON.stringify(orderLine)}` });
 
     // Pay
+    log({ event: "status", data: OrderStatus.REQUESTING_PAYMENT });
+
     throwIfAborted();
     log({ data: `🤘 clicking Betal nå` });
     await page.getByText("Betal nå").click();
@@ -181,6 +190,7 @@ export async function placeOrder(
     log({ data: `🤘 clicking final Vipps button` });
     await page.locator(".primary-button").click();
 
+    log({ event: "status", data: OrderStatus.WAITING_FOR_PAYMENT });
     log({ data: `⏳ waiting for payment in Vipps app` });
 
     throwIfAborted();
@@ -191,6 +201,8 @@ export async function placeOrder(
       .locator(".rental-id")
       .first()
       .textContent();
+
+    log({ event: "status", data: OrderStatus.DONE });
     log({ data: `✅ done: ${reservantionLine}` });
   }
 }

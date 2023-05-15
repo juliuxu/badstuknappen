@@ -5,7 +5,7 @@ import { useLoaderData, useSearchParams } from "@remix-run/react";
 import confetti from "canvas-confetti";
 
 import aerfuglSound from "~/assets/aerfugl-oh.mp3";
-import { getOrderInfo } from "../api.order/schema";
+import { getOrderInfo } from "../api.order/schema.server";
 import { requirePassword } from "../login/route";
 
 const title = "🧖 Bestill Badstue 🌊";
