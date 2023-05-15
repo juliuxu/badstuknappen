@@ -58,7 +58,7 @@ export default function Component() {
               aria-invalid={invalid}
               autoFocus
               required
-              type="password"
+              type="text"
               name="password"
               id="password"
             />
