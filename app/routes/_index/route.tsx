@@ -1,9 +1,16 @@
-import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
+import type {
+  LinksFunction,
+  LoaderArgs,
+  V2_MetaFunction,
+} from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData, useSearchParams } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { nesteUkedagToDate, ukedager } from "~/utils";
-import { requirePassword } from "./login/route";
+import style from "./style.css";
+import { requirePassword } from "../login/route";
+
+export const links: LinksFunction = () => [{ rel: "stylesheet", href: style }];
 
 const title = "Badstuknappen";
 export const meta: V2_MetaFunction = () => {
@@ -173,10 +180,11 @@ export default function Component() {
                 <input required name="mobil" type="tel" />
               </label>
             </div>
+            <button type="submit">Neste</button>
           </article>
         </div>
 
-        {isLocal && (
+        {isLocal && false && (
           <article>
             <h2>Utvikler opsjoner</h2>
             <fieldset>
@@ -193,8 +201,6 @@ export default function Component() {
             </fieldset>
           </article>
         )}
-
-        <button type="submit">Neste</button>
       </form>
     </main>
   );

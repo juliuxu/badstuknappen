@@ -1,0 +1,17 @@
+@media (min-width: 600px) {
+  .grid:has(> label) {
+    grid-template-columns: repeat(auto-fit, minmax(0%, 1fr));
+  }
+}
+
+.grid > article {
+  margin-top: 0;
+}
+.grid > article:last-child {
+  margin-bottom: 0;
+}
+@media (min-width: 992px) {
+  .grid > article {
+    margin-bottom: 0;
+  }
+}

@@ -15,6 +15,8 @@ export default function App() {
   const [searchParams] = useSearchParams();
   const password = searchParams.get("password");
   const homeLink = password ? `/?password=${password}` : "/";
+
+  const isUseMock = searchParams.get("useMock") === "on";
   return (
     <html lang="no" data-theme="dark">
       <head>
@@ -32,7 +34,11 @@ export default function App() {
           <ul>
             <li>
               <a href={homeLink} className="contrast">
-                <strong>Badstuknappen</strong>
+                {isUseMock ? (
+                  <strong>🧪 Badstuknappen 🧪</strong>
+                ) : (
+                  <strong>Badstuknappen</strong>
+                )}
               </a>
             </li>
           </ul>

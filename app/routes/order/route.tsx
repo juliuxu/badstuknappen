@@ -87,35 +87,13 @@ export default function Component() {
     return `${leftPart}:${rightPart}`;
   };
 
-  return (
-    <main className="container">
-      {orderInfo.useMock && (
-        <div
-          style={{
-            border: "4px solid hsl(142, 81%, 50%)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            padding: 16,
-            marginBottom: 32,
-          }}
-        >
-          <div style={{ textAlign: "center" }}>
-            <div
-              style={{
-                fontSize: "1.5rem",
-                fontWeight: "bold",
-              }}
-            >
-              🧪 Mock mode 🧪
-            </div>
-            <i>Simulert bestilling for bruk under testing</i>
-          </div>
-        </div>
-      )}
+  const orderClockTime = shortTimeToClockTime(orderInfo.time);
+  const orderDate = formatter.format(new Date(orderInfo.date));
 
-      {/* INFO */}
-      <p>
+  return (
+    <>
+      {/* Order Summary */}
+      <header className="container">
         <strong>
           {orderInfo.fornavn} {orderInfo.etternavn}
         </strong>
@@ -125,50 +103,65 @@ export default function Component() {
         <strong>{orderInfo.sted}</strong>
         {" for "}
         {" klokken "}
-        <time>{shortTimeToClockTime(orderInfo.time)}</time>{" "}
-        <time>{formatter.format(new Date(orderInfo.date))}</time>
-      </p>
-
-      <div>
-        {!isOrdering && (
-          <button
-            onClick={order}
-            className="outline"
-            style={{
-              aspectRatio: "1 / 0.7",
-              width: "100%",
-              maxHeight: "60vh",
-            }}
-          >
-            Bestill
+        <time>{orderClockTime}</time> <time>{orderDate}</time>
+      </header>
+      <main className="container">
+        <div className="container-fluid">
+          <a href={`/`} role="button" className="outline contrast">
+            🖊️ Endre bestilling
+          </a>
+          <button className="outline contrast">
+            🔗 Del {orderInfo.sted} {orderClockTime} {orderDate}
           </button>
-        )}
+        </div>
 
-        {isOrdering && (
-          <pre
-            style={{
-              aspectRatio: "1 / 1",
-              width: "100%",
-              maxHeight: "60vh",
-            }}
-          >
-            <code
+        <div>
+          {!isOrdering && <button onClick={order}>Bestill</button>}
+
+          {isOrdering && (
+            <pre
               style={{
-                height: "100%",
-                display: "flex",
-                overflow: "auto",
-                flexDirection: "column-reverse",
-                gap: "4px",
+                aspectRatio: "1 / 1",
+                width: "100%",
+                maxHeight: "60vh",
               }}
             >
-              {eventLog.map((event) => (
-                <div key={JSON.stringify(event)}>{event.data}</div>
-              ))}
-            </code>
-          </pre>
+              <code
+                style={{
+                  height: "100%",
+                  display: "flex",
+                  overflow: "auto",
+                  flexDirection: "column-reverse",
+                  gap: "4px",
+                }}
+              >
+                {eventLog.map((event) => (
+                  <div key={JSON.stringify(event)}>{event.data}</div>
+                ))}
+              </code>
+            </pre>
+          )}
+        </div>
+
+        {orderInfo.useMock && (
+          <div
+            style={{
+              border: "4px solid hsl(142, 81%, 50%)",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: 16,
+              marginBottom: 32,
+            }}
+          >
+            <hgroup style={{ textAlign: "center" }}>
+              <h2>🧪 Mock mode 🧪</h2>
+              <small>Simulert bestilling for bruk under testing</small>
+            </hgroup>
+          </div>
         )}
-      </div>
-    </main>
+      </main>
+    </>
   );
 }
 
