@@ -38,6 +38,18 @@ export default function Component() {
     return sound;
   });
 
+  const onSuccess = () => {
+    // Play some sounds
+    Array(10)
+      .fill(0)
+      .forEach(() => {
+        new Audio(aerfuglSound).play();
+      });
+
+    // And show some confetti
+    showConfetti();
+  };
+
   const order = () => {
     sound?.play();
 
@@ -50,15 +62,11 @@ export default function Component() {
     eventSource.addEventListener("message", (message) => {
       if (message.data.includes("✅ done")) {
         if (document.visibilityState === "hidden") {
-          document.addEventListener(
-            "visibilitychange",
-            () => {
-              showConfetti();
-            },
-            { once: true }
-          );
+          document.addEventListener("visibilitychange", onSuccess, {
+            once: true,
+          });
         } else {
-          showConfetti();
+          onSuccess();
         }
       }
 
