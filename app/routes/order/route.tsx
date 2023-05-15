@@ -1,10 +1,15 @@
 import { useState } from "react";
 import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData, useSearchParams } from "@remix-run/react";
+import {
+  useLoaderData,
+  useRouteLoaderData,
+  useSearchParams,
+} from "@remix-run/react";
 import confetti from "canvas-confetti";
 
 import aerfuglSound from "~/assets/aerfugl-oh.mp3";
+import type { OrderInfo } from "../api.order/schema.server";
 import { getOrderInfo } from "../api.order/schema.server";
 import { requirePassword } from "../login/route";
 
@@ -82,21 +87,10 @@ export default function Component() {
 
   const { orderInfo } = useLoaderData<typeof loader>();
 
-  // Formatting
-  const formatter = new Intl.DateTimeFormat("no-nb", { dateStyle: "full" });
-
-  // 07 -> 07:00
-  // 7 -> 07:00
-  // 8.5 -> 08:30
-  const shortTimeToClockTime = (timeString: string) => {
-    const leftPart = timeString.split(".")[0].padStart(2, "0");
-    let rightPart = timeString.split(".")[1] ?? "00";
-    rightPart = rightPart.replace("5", "30");
-    return `${leftPart}:${rightPart}`;
-  };
-
-  const orderClockTime = shortTimeToClockTime(orderInfo.time);
-  const orderDate = formatter.format(new Date(orderInfo.date));
+  const { formattedDate, formatedClockTime } = formatDateTime({
+    date: orderInfo.date,
+    time: orderInfo.time,
+  });
 
   return (
     <>
@@ -111,18 +105,10 @@ export default function Component() {
         <strong>{orderInfo.sted}</strong>
         {" for "}
         {" klokken "}
-        <time>{orderClockTime}</time> <time>{orderDate}</time>
+        {formatedClockTime} {formattedDate}
       </header>
-      <main className="container">
-        <div className="container-fluid">
-          <a href={`/`} role="button" className="outline contrast">
-            🖊️ Endre bestilling
-          </a>
-          <button className="outline contrast">
-            🔗 Del {orderInfo.sted} {orderClockTime} {orderDate}
-          </button>
-        </div>
 
+      <main className="container">
         <div>
           {!isOrdering && <button onClick={order}>Bestill</button>}
 
@@ -131,7 +117,7 @@ export default function Component() {
               style={{
                 aspectRatio: "1 / 1",
                 width: "100%",
-                maxHeight: "60vh",
+                maxHeight: "50vh",
               }}
             >
               <code
@@ -151,7 +137,7 @@ export default function Component() {
           )}
         </div>
 
-        {orderInfo.useMock && (
+        {orderInfo.useMock && false && (
           <div
             style={{
               border: "4px solid hsl(142, 81%, 50%)",
@@ -170,6 +156,67 @@ export default function Component() {
         )}
       </main>
     </>
+  );
+}
+
+export function OrderActions() {
+  const [searchParams] = useSearchParams();
+  const data = useRouteLoaderData("routes/order");
+  if (!data) return null;
+
+  const { orderInfo } = data as { orderInfo: OrderInfo };
+
+  const { formattedDate, formatedClockTime } = formatDateTime({
+    date: orderInfo.date,
+    time: orderInfo.time,
+  });
+
+  const editLink = `/?${searchParams}`;
+
+  const { password, date, sted, time } = orderInfo;
+  const shareLink = `/?${new URLSearchParams({
+    password,
+    date,
+    sted,
+    time,
+    share: "true",
+  })}`;
+  const shareData = {
+    title: `Badstue ${orderInfo.sted}`,
+    text: `Bli med i badstuen ${formatedClockTime} ${formattedDate} på ${orderInfo.sted}`,
+    url: shareLink,
+  };
+  return (
+    <ul>
+      <li>
+        <a href={editLink} role="button" className="outline contrast">
+          🖊️ Endre bestilling
+        </a>
+      </li>
+      <li>
+        <a
+          data-placement="left"
+          data-tooltip="Kopier denne lenken og send til en venn"
+          target="_blank"
+          href={shareLink}
+          role="button"
+          className="outline contrast"
+          rel="noreferrer"
+          onClick={(e) => {
+            if (
+              navigator.share !== undefined &&
+              navigator.canShare(shareData)
+            ) {
+              e.preventDefault();
+              console.log("sharing", shareData);
+              navigator.share(shareData);
+            }
+          }}
+        >
+          🔗 Del
+        </a>
+      </li>
+    </ul>
   );
 }
 
@@ -215,4 +262,29 @@ function showConfetti() {
       startVelocity: 45,
     });
   }
+}
+
+export function formatDateTime({
+  time,
+  date,
+}: {
+  time: string;
+  date: string | Date;
+}) {
+  const formatter = new Intl.DateTimeFormat("no-nb", { dateStyle: "full" });
+
+  // 07 -> 07:00
+  // 7 -> 07:00
+  // 8.5 -> 08:30
+  const shortTimeToClockTime = (timeString: string) => {
+    const leftPart = timeString.split(".")[0].padStart(2, "0");
+    let rightPart = timeString.split(".")[1] ?? "00";
+    rightPart = rightPart.replace("5", "30");
+    return `${leftPart}:${rightPart}`;
+  };
+
+  const formatedClockTime = shortTimeToClockTime(time);
+  const formattedDate = formatter.format(new Date(date));
+
+  return { formattedDate, formatedClockTime };
 }

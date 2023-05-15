@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { nesteUkedagToDate, ukedager } from "~/utils";
 import style from "./style.css";
 import { requirePassword } from "../login/route";
+import { formatDateTime } from "../order/route";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: style }];
 
@@ -33,9 +34,13 @@ export default function Component() {
 
   const [search] = useSearchParams();
 
+  const defaultDate = search.get("date") ?? undefined;
+
   // Date selector logic
   const [dateFormat, setDateformat] = useState<"relative" | "absolute">(
-    "relative"
+    defaultDate === undefined || defaultDate?.startsWith("neste-")
+      ? "relative"
+      : "absolute"
   );
   useEffect(() => {
     if (dateFormat === "absolute") {
@@ -47,8 +52,50 @@ export default function Component() {
     }
   }, [dateFormat]);
 
+  let shareMessage = undefined;
+  if (
+    search.get("share") &&
+    search.get("sted") &&
+    search.get("time") &&
+    defaultDate !== undefined
+  ) {
+    const date = defaultDate.startsWith("neste-")
+      ? nesteUkedagToDate(defaultDate.split("-")[1] as any)
+      : defaultDate;
+    const time = search.get("time") ?? "18:00";
+    const { formattedDate, formatedClockTime } = formatDateTime({ date, time });
+    shareMessage = (
+      <>
+        🎉 Du har blitt invitert med i badstuen{" "}
+        <strong>
+          {formatedClockTime} {formattedDate}
+        </strong>{" "}
+        på{" "}
+        <strong>
+          {search.get("sted")![0].toLocaleUpperCase() +
+            search.get("sted")!.slice(1)}
+        </strong>
+        . Bli med da vell 🧖
+      </>
+    );
+  }
+
   return (
     <main className="container">
+      {shareMessage && (
+        <p
+          style={{
+            textAlign: "center",
+            border: "4px solid var(--card-background-color)",
+            borderRadius: "var(--border-radius)",
+            boxShadow: "var(--card-box-shadow)",
+            padding: 16,
+          }}
+        >
+          {shareMessage}
+        </p>
+      )}
+
       <form action="/order" method="get">
         <input
           hidden
@@ -62,7 +109,11 @@ export default function Component() {
             <h2>Tid og sted</h2>
             <label>
               Sted
-              <select required name="sted">
+              <select
+                required
+                name="sted"
+                defaultValue={search.get("sted") ?? undefined}
+              >
                 <option value="sukkerbiten">Sukkerbiten</option>
                 <option value="langkaia">Langkaia</option>
               </select>
@@ -87,6 +138,7 @@ export default function Component() {
                         type="radio"
                         name="date"
                         value={`neste-${dag}`}
+                        defaultChecked={defaultDate === `neste-${dag}`}
                         required
                         onClick={() => {
                           // Preview the date
@@ -104,6 +156,12 @@ export default function Component() {
                 <label>
                   Eller dato
                   <input
+                    defaultValue={
+                      defaultDate !== undefined &&
+                      !defaultDate?.startsWith("neste-")
+                        ? defaultDate
+                        : undefined
+                    }
                     disabled={dateFormat !== "absolute"}
                     required
                     name="date"
@@ -116,6 +174,7 @@ export default function Component() {
             <label>
               Tidspunkt
               <input
+                defaultValue={search.get("time") ?? undefined}
                 required
                 name="time"
                 inputMode="numeric"
@@ -132,7 +191,15 @@ export default function Component() {
                   name="isMember"
                   role="switch"
                   type="checkbox"
-                  defaultChecked
+                  autoComplete="off"
+                  // Hack to know when the form has been previously
+                  // prefilled
+                  // When the checkbox is unchecked, the value is not sent
+                  defaultChecked={
+                    search.get("antall") === null
+                      ? true
+                      : search.get("isMember") === "on"
+                  }
                 />
                 Er medlem
                 <small style={{ marginTop: 8 }}>
@@ -149,7 +216,11 @@ export default function Component() {
             </fieldset>
             <label>
               Antall
-              <select required name="antall">
+              <select
+                required
+                name="antall"
+                defaultValue={search.get("antall") ?? undefined}
+              >
                 {Array(4)
                   .fill(0)
                   .map((_, i) => (
@@ -163,28 +234,49 @@ export default function Component() {
             <div className="grid">
               <label>
                 Fornavn
-                <input required name="fornavn" type="text" />
+                <input
+                  autoFocus={search.get("share") === "true"}
+                  required
+                  name="fornavn"
+                  type="text"
+                  defaultValue={search.get("fornavn") ?? undefined}
+                />
               </label>
               <label>
                 Etternavn
-                <input required name="etternavn" type="text" />
+                <input
+                  required
+                  name="etternavn"
+                  type="text"
+                  defaultValue={search.get("etternavn") ?? undefined}
+                />
               </label>
             </div>
             <div className="grid">
               <label>
                 Epost
-                <input required name="epost" type="email" />
+                <input
+                  required
+                  name="epost"
+                  type="email"
+                  defaultValue={search.get("epost") ?? undefined}
+                />
               </label>
               <label>
                 Mobil
-                <input required name="mobil" type="tel" />
+                <input
+                  required
+                  name="mobil"
+                  type="tel"
+                  defaultValue={search.get("mobil") ?? undefined}
+                />
               </label>
             </div>
             <button type="submit">Neste</button>
           </article>
         </div>
 
-        {isLocal && false && (
+        {isLocal && true && (
           <article>
             <h2>Utvikler opsjoner</h2>
             <fieldset>

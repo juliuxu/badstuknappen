@@ -10,6 +10,7 @@ import {
 import picoCss from "@picocss/pico/css/pico.min.css";
 
 import style from "./style.css";
+import { OrderActions } from "./routes/order/route";
 
 export default function App() {
   const [searchParams] = useSearchParams();
@@ -42,6 +43,7 @@ export default function App() {
               </a>
             </li>
           </ul>
+          <OrderActions />
         </nav>
         <Outlet />
         <ScrollRestoration />
