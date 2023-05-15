@@ -23,7 +23,6 @@ export const loader = ({ request }: LoaderArgs) => {
 
 export default function Component() {
   const { isLocal } = useLoaderData<typeof loader>();
-  const [url, setUrl] = useState("");
 
   const [search] = useSearchParams();
 
@@ -43,49 +42,11 @@ export default function Component() {
 
   return (
     <main className="container">
-      {url && (
-        <>
-          <hgroup>
-            <h2 id="url">🎉 Linken er klar 🎉</h2>
-            <h3>Åpne linken når du er klar for å bestille</h3>
-          </hgroup>
-          <a href={url} target="_blank" rel="noreferrer">
-            👉 Trykk her eller kopier linken for senere 👈
-          </a>
-          <br />
-          <br />
-          <pre>
-            <code>{url}</code>
-          </pre>
-        </>
-      )}
-
       <hgroup>
         <h2>URL Bygger</h2>
         <h3>Bygg din personlige badstue bestiller url</h3>
       </hgroup>
-      <form
-        action="/order"
-        method="get"
-        onSubmit={(e) => {
-          e.preventDefault();
-
-          const form = new FormData(e.currentTarget);
-          const actionUrl = new URL(window.location.href);
-          actionUrl.pathname = "/order";
-          actionUrl.search = new URLSearchParams(
-            Object.fromEntries(form) as any
-          ).toString();
-
-          setUrl(actionUrl.toString());
-
-          setTimeout(() => {
-            document
-              .getElementById("url")
-              ?.scrollIntoView({ behavior: "smooth" });
-          }, 100);
-        }}
-      >
+      <form action="/order" method="get">
         <input
           hidden
           readOnly
@@ -208,7 +169,7 @@ export default function Component() {
           </fieldset>
         )}
 
-        <button type="submit">Bygg url</button>
+        <button type="submit">Neste</button>
       </form>
     </main>
   );
