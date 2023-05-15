@@ -77,8 +77,11 @@ export default function Component() {
 
   return (
     <main className="container">
-      {shareMessage && <Alert>{shareMessage}</Alert>}
-
+      {shareMessage && (
+        <div id="top-alert">
+          <Alert>{shareMessage}</Alert>
+        </div>
+      )}
       <form action="/order" method="get">
         <input
           hidden
@@ -165,7 +168,11 @@ export default function Component() {
               />
             </label>
           </article>
-
+          {shareMessage && (
+            <div id="middle-alert">
+              <Alert>{shareMessage}</Alert>
+            </div>
+          )}
           <article>
             <h2>Din informasjon</h2>
             <fieldset>
