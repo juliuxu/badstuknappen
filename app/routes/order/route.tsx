@@ -12,6 +12,8 @@ import aerfuglSound from "~/assets/aerfugl-oh.mp3";
 import type { OrderInfo } from "../api.order/schema.server";
 import { getOrderInfo } from "../api.order/schema.server";
 import { requirePassword } from "../login/route";
+import { OrderStatus } from "../api.order/order-status";
+import { capitalize } from "../_index/route";
 
 const title = "🧖 Bestill Badstue 🌊";
 export const meta: V2_MetaFunction = () => {
@@ -32,7 +34,6 @@ export default function Component() {
   const [searchParams] = useSearchParams();
   const relativeUrl = `/api/order?${searchParams}`;
 
-  const [isOrdering, setIsOrdering] = useState(false);
   const [eventLog, setEventLog] = useState<EventType[]>([]);
 
   // Play the sound of the Ærfugl when ordering
@@ -45,27 +46,32 @@ export default function Component() {
 
   const onSuccess = () => {
     // Play some sounds
-    Array(10)
+    Array(6)
       .fill(0)
-      .forEach(() => {
+      .forEach((i) => {
         new Audio(aerfuglSound).play();
+        setTimeout(() => new Audio(aerfuglSound).play(), 100 + i * 50);
       });
 
     // And show some confetti
     showConfetti();
   };
 
+  const [orderStatus, setOrderStatus] = useState<OrderStatus | undefined>(
+    undefined
+  );
   const order = () => {
     sound?.play();
 
-    setIsOrdering(true);
     setEventLog([]);
     const eventSource = new EventSource(relativeUrl);
     eventSource.addEventListener("error", () => {
       eventSource.close();
     });
-    eventSource.addEventListener("message", (message) => {
-      if (message.data.includes("✅ done")) {
+    eventSource.addEventListener("status", (message) => {
+      const status = message.data as OrderStatus;
+      setOrderStatus(status);
+      if (status === OrderStatus.DONE) {
         if (document.visibilityState === "hidden") {
           document.addEventListener("visibilitychange", onSuccess, {
             once: true,
@@ -74,7 +80,8 @@ export default function Component() {
           onSuccess();
         }
       }
-
+    });
+    eventSource.addEventListener("message", (message) => {
       setEventLog((currentEventLog) => [
         { data: message.data, time: new Date().toISOString() },
         ...currentEventLog,
@@ -94,30 +101,46 @@ export default function Component() {
 
   return (
     <>
-      {/* Order Summary */}
-      <header className="container">
-        <strong>
-          {orderInfo.fornavn} {orderInfo.etternavn}
-        </strong>
-        {" bestill "}
-        {orderInfo.antall} {orderInfo.antall === 1 ? "billett" : "billetter"}
-        {" på "}
-        <strong>{orderInfo.sted}</strong>
-        {" for "}
-        {" klokken "}
-        {formatedClockTime} {formattedDate}
-      </header>
-
       <main className="container">
-        <div>
-          {!isOrdering && <button onClick={order}>Bestill</button>}
+        {/* Order Summary */}
+        <article style={{ marginTop: 0 }}>
+          <header aria-busy={orderStatus && orderStatus !== OrderStatus.DONE}>
+            {orderStatus === OrderStatus.DONE ? (
+              <>🎉 Badstu er bestilt 🎉</>
+            ) : (
+              "Bestill badstu"
+            )}
+          </header>
+          <strong>
+            {orderInfo.fornavn} {orderInfo.etternavn}{" "}
+          </strong>
+          <i>({orderInfo.isMember ? "medlem" : "ikke medlem"})</i>
+          <br />
+          <span>{orderInfo.epost}</span>
+          <br />
+          <span>{orderInfo.mobil}</span>
+          <br />
+          <strong>{orderInfo.antall}</strong>{" "}
+          {orderInfo.antall === 1 ? "billett" : "billetter"}
+          <br />
+          <strong>
+            {formatedClockTime} {formattedDate}
+          </strong>
+          {" på "}
+          <strong>{capitalize(orderInfo.sted)}</strong>
+        </article>
 
-          {isOrdering && (
+        <div>
+          {orderStatus === undefined && (
+            <button onClick={order}>Bestill</button>
+          )}
+
+          {orderStatus && (
             <pre
               style={{
                 aspectRatio: "1 / 1",
                 width: "100%",
-                maxHeight: "50vh",
+                maxHeight: "35vh",
               }}
             >
               <code
@@ -189,8 +212,8 @@ export function OrderActions() {
   return (
     <ul>
       <li>
-        <a href={editLink} role="button" className="outline contrast">
-          🖊️ Endre bestilling
+        <a href={editLink} className="secondary">
+          🖊️ Endre info
         </a>
       </li>
       <li>
@@ -199,8 +222,7 @@ export function OrderActions() {
           data-tooltip="Kopier denne lenken og send til en venn"
           target="_blank"
           href={shareLink}
-          role="button"
-          className="outline contrast"
+          className=""
           rel="noreferrer"
           onClick={(e) => {
             if (
@@ -228,7 +250,7 @@ function showConfetti() {
   function showConfettiInner() {
     const count = 200;
     const defaults = {
-      origin: { y: 0.7 },
+      origin: { y: 0.5 },
     };
 
     function fire(particleRatio: number, opts: Parameters<typeof confetti>[0]) {
@@ -287,4 +309,10 @@ export function formatDateTime({
   const formattedDate = formatter.format(new Date(date));
 
   return { formattedDate, formatedClockTime };
+}
+
+export function assertUnreachable(x: never): never {
+  const error = new Error(`Unknown value ${x}`);
+  console.error(`assertUnreachable`, error);
+  throw error;
 }

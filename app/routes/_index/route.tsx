@@ -70,31 +70,14 @@ export default function Component() {
         <strong>
           {formatedClockTime} {formattedDate}
         </strong>{" "}
-        på{" "}
-        <strong>
-          {search.get("sted")![0].toLocaleUpperCase() +
-            search.get("sted")!.slice(1)}
-        </strong>
-        . Bli med da vell 🧖
+        på <strong>{capitalize(search.get("sted"))}</strong>. Bli med da vell 🧖
       </>
     );
   }
 
   return (
     <main className="container">
-      {shareMessage && (
-        <p
-          style={{
-            textAlign: "center",
-            border: "4px solid var(--card-background-color)",
-            borderRadius: "var(--border-radius)",
-            boxShadow: "var(--card-box-shadow)",
-            padding: 16,
-          }}
-        >
-          {shareMessage}
-        </p>
-      )}
+      {shareMessage && <Alert>{shareMessage}</Alert>}
 
       <form action="/order" method="get">
         <input
@@ -147,7 +130,7 @@ export default function Component() {
                           )!.value = nesteUkedagToDate(dag);
                         }}
                       />
-                      {dag[0].toUpperCase() + dag.slice(1)}
+                      {capitalize(dag)}
                     </label>
                   ))}
                 </fieldset>
@@ -296,4 +279,25 @@ export default function Component() {
       </form>
     </main>
   );
+}
+
+export function Alert({ children }: { children: React.ReactNode }) {
+  return (
+    <p
+      style={{
+        textAlign: "center",
+        border: "4px solid var(--card-background-color)",
+        borderRadius: "var(--border-radius)",
+        boxShadow: "var(--card-box-shadow)",
+        padding: 16,
+      }}
+    >
+      {children}
+    </p>
+  );
+}
+
+export function capitalize(s?: string | null) {
+  if (!s) return "";
+  return s[0].toUpperCase() + s.slice(1);
 }
