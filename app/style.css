@@ -3,3 +3,10 @@
     grid-template-columns: repeat(auto-fit, minmax(0%, 1fr));
   }
 }
+
+.grid > article:first-child {
+  margin-top: 0;
+}
+.grid > article:last-child {
+  margin-bottom: 0;
+}

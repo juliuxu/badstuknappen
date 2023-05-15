@@ -167,9 +167,7 @@ export default function Component() {
         </div>
 
         {isLocal && (
-          <article
-            style={{ marginTop: "calc(- var(--block-spacing-vertical))" }}
-          >
+          <article>
             <h2>Utvikler opsjoner</h2>
             <fieldset>
               <label>
