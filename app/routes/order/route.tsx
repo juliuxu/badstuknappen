@@ -49,9 +49,17 @@ export default function Component() {
     });
     eventSource.addEventListener("message", (message) => {
       if (message.data.includes("✅ done")) {
-        setTimeout(showConfetti, 200);
-        setTimeout(showConfetti, 600);
-        setTimeout(showConfetti, 800);
+        if (document.visibilityState === "hidden") {
+          document.addEventListener(
+            "visibilitychange",
+            () => {
+              showConfetti();
+            },
+            { once: true }
+          );
+        } else {
+          showConfetti();
+        }
       }
 
       setEventLog((currentEventLog) => [
@@ -81,6 +89,31 @@ export default function Component() {
 
   return (
     <main className="container">
+      {orderInfo.useMock && (
+        <div
+          style={{
+            border: "4px solid hsl(142, 81%, 50%)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 16,
+            marginBottom: 32,
+          }}
+        >
+          <div style={{ textAlign: "center" }}>
+            <div
+              style={{
+                fontSize: "1.5rem",
+                fontWeight: "bold",
+              }}
+            >
+              🧪 Mock mode 🧪
+            </div>
+            <i>Simulert bestilling for bruk under testing</i>
+          </div>
+        </div>
+      )}
+
       {/* INFO */}
       <p>
         <strong>
@@ -95,30 +128,6 @@ export default function Component() {
         <time>{shortTimeToClockTime(orderInfo.time)}</time>{" "}
         <time>{formatter.format(new Date(orderInfo.date))}</time>
       </p>
-
-      {orderInfo.useMock && (
-        <p
-          style={{
-            border: "4px solid hsl(142, 81%, 50%)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            padding: 16,
-          }}
-        >
-          <div style={{ textAlign: "center" }}>
-            <div
-              style={{
-                fontSize: "1.5rem",
-                fontWeight: "bold",
-              }}
-            >
-              🧪 Mock mode 🧪
-            </div>
-            <i>Simulert bestilling for bruk under testing</i>
-          </div>
-        </p>
-      )}
 
       <div>
         {!isOrdering && (
@@ -164,40 +173,45 @@ export default function Component() {
 }
 
 // Show confetti when ordering is done
-async function showConfetti() {
-  const count = 200;
-  const defaults = {
-    origin: { y: 0.7 },
-  };
+function showConfetti() {
+  setTimeout(showConfettiInner, 200);
+  setTimeout(showConfettiInner, 600);
+  setTimeout(showConfettiInner, 800);
+  function showConfettiInner() {
+    const count = 200;
+    const defaults = {
+      origin: { y: 0.7 },
+    };
 
-  function fire(particleRatio: number, opts: Parameters<typeof confetti>[0]) {
-    confetti(
-      Object.assign({}, defaults, opts, {
-        particleCount: Math.floor(count * particleRatio),
-      })
-    );
+    function fire(particleRatio: number, opts: Parameters<typeof confetti>[0]) {
+      confetti(
+        Object.assign({}, defaults, opts, {
+          particleCount: Math.floor(count * particleRatio),
+        })
+      );
+    }
+
+    fire(0.25, {
+      spread: 26,
+      startVelocity: 55,
+    });
+    fire(0.2, {
+      spread: 60,
+    });
+    fire(0.35, {
+      spread: 100,
+      decay: 0.91,
+      scalar: 0.8,
+    });
+    fire(0.1, {
+      spread: 120,
+      startVelocity: 25,
+      decay: 0.92,
+      scalar: 1.2,
+    });
+    fire(0.1, {
+      spread: 120,
+      startVelocity: 45,
+    });
   }
-
-  fire(0.25, {
-    spread: 26,
-    startVelocity: 55,
-  });
-  fire(0.2, {
-    spread: 60,
-  });
-  fire(0.35, {
-    spread: 100,
-    decay: 0.91,
-    scalar: 0.8,
-  });
-  fire(0.1, {
-    spread: 120,
-    startVelocity: 25,
-    decay: 0.92,
-    scalar: 1.2,
-  });
-  fire(0.1, {
-    spread: 120,
-    startVelocity: 45,
-  });
 }
