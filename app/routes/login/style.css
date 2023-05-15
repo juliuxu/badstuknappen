@@ -6,14 +6,15 @@ article > div:first-child {
 }
 
 img {
+  display: none;
   object-fit: cover;
   object-position: center;
   height: 100%;
-  height: -webkit-fill-available;
+  max-height: -webkit-fill-available;
 }
 
-@media screen and (max-width: 768px) {
+@media (min-width: 600px) {
   img {
-    display: none;
+    display: block;
   }
 }
