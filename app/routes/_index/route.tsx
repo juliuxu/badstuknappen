@@ -15,7 +15,13 @@ export const links: LinksFunction = () => [{ rel: "stylesheet", href: style }];
 
 const title = "Badstuknappen";
 export const meta: V2_MetaFunction = () => {
-  return [{ title }];
+  return [
+    { title },
+    {
+      name: "description",
+      content: "Beste måten å bestille ditt neste badstue besøk på",
+    },
+  ];
 };
 
 export const loader = ({ request }: LoaderArgs) => {
