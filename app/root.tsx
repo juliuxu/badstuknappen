@@ -8,25 +8,17 @@ import {
 } from "@remix-run/react";
 import picoCss from "@picocss/pico/css/pico.min.css";
 
+import style from "./style.css";
+
 export default function App() {
   return (
-    <html lang="no">
+    <html lang="no" data-theme="dark">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
 
         <link rel="stylesheet" href={picoCss} />
-        <style
-          dangerouslySetInnerHTML={{
-            __html: `        
-@media (min-width: 600px) {
-  .grid {
-      grid-template-columns: repeat(auto-fit,minmax(0%,1fr));
-  }
-}
-        `,
-          }}
-        />
+        <link rel="stylesheet" href={style} />
 
         <Meta />
         <Links />
