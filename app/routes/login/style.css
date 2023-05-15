@@ -13,7 +13,7 @@ img {
   max-height: -webkit-fill-available;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 992px) {
   img {
     display: block;
   }

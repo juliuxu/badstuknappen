@@ -5,12 +5,16 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useSearchParams,
 } from "@remix-run/react";
 import picoCss from "@picocss/pico/css/pico.min.css";
 
 import style from "./style.css";
 
 export default function App() {
+  const [searchParams] = useSearchParams();
+  const password = searchParams.get("password");
+  const homeLink = password ? `/?password=${password}` : "/";
   return (
     <html lang="no" data-theme="dark">
       <head>
@@ -27,7 +31,7 @@ export default function App() {
         <nav className="container-fluid">
           <ul>
             <li>
-              <a href="/" className="contrast">
+              <a href={homeLink} className="contrast">
                 <strong>Badstuknappen</strong>
               </a>
             </li>

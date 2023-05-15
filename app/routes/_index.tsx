@@ -59,6 +59,16 @@ export default function Component() {
                 <option value="sukkerbiten">Sukkerbiten</option>
                 <option value="langkaia">Langkaia</option>
               </select>
+              <small>
+                Se ledige{" "}
+                <a
+                  href="https://badstu.karl.run/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  badstu timer ↗
+                </a>
+              </small>
             </label>
             <div className="grid">
               <div onClick={() => setDateformat("relative")}>
@@ -118,17 +128,17 @@ export default function Component() {
                   defaultChecked
                 />
                 Er medlem
+                <small style={{ marginTop: 8 }}>
+                  Få billigere billettpris og støtt Oslo Badstuforening.{" "}
+                  <a
+                    href="https://oslobadstuforening.no/bli-medlem/"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Bli medlem her ↗
+                  </a>
+                </small>
               </label>
-              <small>
-                Få billigere billettpris og støtt Oslo Badstuforening.{" "}
-                <a
-                  href="https://oslobadstuforening.no/bli-medlem/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Bli medlem her ↗
-                </a>
-              </small>
             </fieldset>
             <label>
               Antall
