@@ -66,7 +66,9 @@ export default function Component() {
             <button type="submit">Logg inn</button>
           </form>
         </div>
-        <img src={saunaImg} alt="En badstue ved sjøen" />
+        <div>
+          <img src={saunaImg} alt="En badstue ved sjøen" />
+        </div>
       </article>
     </main>
   );

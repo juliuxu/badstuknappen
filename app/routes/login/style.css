@@ -1,7 +1,7 @@
 article {
   padding: 0;
 }
-article > div {
+article > div:first-child {
   padding: 3rem;
 }
 
@@ -9,6 +9,7 @@ img {
   object-fit: cover;
   object-position: center;
   height: 100%;
+  height: -webkit-fill-available;
 }
 
 @media screen and (max-width: 768px) {
