@@ -9,9 +9,9 @@
   },
   "dependencies": {
     "@picocss/pico": "1.5.10",
-    "@remix-run/node": "1.16.0",
-    "@remix-run/react": "1.16.0",
-    "@remix-run/serve": "1.16.0",
+    "@remix-run/node": "1.16.1",
+    "@remix-run/react": "1.16.1",
+    "@remix-run/serve": "1.16.1",
     "canvas-confetti": "1.6.0",
     "isbot": "^3.6.8",
     "playwright": "1.33.0",
@@ -21,8 +21,8 @@
     "zod": "3.21.4"
   },
   "devDependencies": {
-    "@remix-run/dev": "1.16.0",
-    "@remix-run/eslint-config": "1.16.0",
+    "@remix-run/dev": "1.16.1",
+    "@remix-run/eslint-config": "1.16.1",
     "@types/canvas-confetti": "1.6.0",
     "@types/react": "18.2.6",
     "@types/react-dom": "18.2.4",
