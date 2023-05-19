@@ -47,12 +47,3 @@ export function nesteUkedagToDate(value: Ukedag, fromDate = new Date()) {
     "0"
   )}-${String(date.getDate()).padStart(2, "0")}`;
 }
-
-// export async function getSteder(page: playwright.Page) {
-//   await page.goto("https://oslobadstuforening.no/sok-dropin/");
-
-//   const options = await page.locator("#box_prop_res_sted > option").all();
-//   return (
-//     await Promise.all(options.map((option) => option.getAttribute("value")))
-//   ).filter((sted) => sted !== "none");
-// }
