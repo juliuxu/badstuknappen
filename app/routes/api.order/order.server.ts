@@ -1,14 +1,14 @@
 import playwright from "playwright";
-import type { OrderInfo } from "./schema.server";
+import type { OrderRequest } from "./schema.server";
 import { OrderStatus } from "./order-status";
 
-const stedToStedId: Record<OrderInfo["sted"], string> = {
+const stedToStedId: Record<OrderRequest["sted"], string> = {
   sukkerbiten: "184637%27,184637)",
   langkaia: "189278%27,189278)",
 };
 
 interface OrderUrlInfo {
-  sted: OrderInfo["sted"];
+  sted: OrderRequest["sted"];
   date: string; // "05.05.2023"
   time: string; // "07"
 }
@@ -18,16 +18,10 @@ export const buildOrderUrl = ({ sted, date, time }: OrderUrlInfo) => {
 };
 
 export async function placeOrder(
-  orderInfo: OrderInfo,
+  orderInfo: OrderRequest,
   log: (obj: { event?: string; data: string }) => void,
   abortController: AbortController
 ) {
-  if (orderInfo.password !== process.env.PASSWORD) {
-    log({ data: `❌ WRONG PASSWORD ❌` });
-    abortController.abort();
-    return;
-  }
-
   log({
     data: `🤖 Ordering with info: ${JSON.stringify(orderInfo)}`,
   });

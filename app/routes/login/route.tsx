@@ -8,14 +8,15 @@ import style from "./style.css";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: style }];
 
+const PASSWORD_KEY = "password";
 export function requirePassword(fromRequest: Request) {
   const url = new URL(fromRequest.url);
 
-  const password = url.searchParams.get("password");
+  const password = url.searchParams.get(PASSWORD_KEY);
   const expectedPassword = process.env.PASSWORD;
 
   if (!password) {
-    throw redirect("/login?cause=missing-password");
+    throw redirect("/login");
   }
 
   if (!safeCompare(password, expectedPassword)) {
@@ -25,7 +26,7 @@ export function requirePassword(fromRequest: Request) {
 
 export const action = async ({ request }: ActionArgs) => {
   const formData = await request.formData();
-  const password = String(formData.get("password"));
+  const password = String(formData.get(PASSWORD_KEY));
   if (safeCompare(password, process.env.PASSWORD)) {
     return redirect(`/?password=${password}`);
   }
@@ -53,14 +54,14 @@ export default function Component() {
           </hgroup>
 
           <form method="post">
-            <label htmlFor="password">Passord</label>
+            <label htmlFor={PASSWORD_KEY}>Passord</label>
             <input
               aria-invalid={invalid}
               autoFocus
               required
               type="text"
-              name="password"
-              id="password"
+              name={PASSWORD_KEY}
+              id={PASSWORD_KEY}
             />
             {message && <small className="error">{message}</small>}
             <button type="submit">Logg inn</button>

@@ -6,10 +6,15 @@ import type {
 import { json } from "@remix-run/node";
 import { useLoaderData, useSearchParams } from "@remix-run/react";
 import { useEffect, useState } from "react";
-import { nesteUkedagToDate, ukedager } from "~/utils";
+import {
+  FormattedTimeAndPlace,
+  capitalize,
+  isLocalUrl,
+  nesteUkedagToDate,
+  ukedager,
+} from "~/utils";
 import style from "./style.css";
 import { requirePassword } from "../login/route";
-import { formatDateTime } from "../order/route";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: style }];
 
@@ -19,19 +24,15 @@ export const meta: V2_MetaFunction = () => {
     { title },
     {
       name: "description",
-      content: "Beste måten å bestille ditt neste badstue besøk på",
+      content: "Beste måten å bestille ditt neste badstu besøk på",
     },
   ];
 };
 
 export const loader = ({ request }: LoaderArgs) => {
   requirePassword(request);
-  const url = new URL(request.url);
   return json({
-    isLocal:
-      url.hostname.includes("192.168") ||
-      url.hostname.includes("127.0.0.1") ||
-      url.hostname.includes("localhost"),
+    isLocal: isLocalUrl(request.url),
   });
 };
 
@@ -69,14 +70,13 @@ export default function Component() {
       ? nesteUkedagToDate(defaultDate.split("-")[1] as any)
       : defaultDate;
     const time = search.get("time") ?? "18:00";
-    const { formattedDate, formatedClockTime } = formatDateTime({ date, time });
     shareMessage = (
       <>
         🎉 Du har blitt invitert med i badstuen{" "}
-        <strong>
-          {formatedClockTime} {formattedDate}
-        </strong>{" "}
-        på <strong>{capitalize(search.get("sted"))}</strong>. Bli med da vell 🧖
+        <FormattedTimeAndPlace
+          {...{ date, time, sted: search.get("sted") as "sukkerbiten" }}
+        />
+        . Bli med da vell 🧖
       </>
     );
   }
@@ -308,9 +308,4 @@ export function Alert({ children }: { children: React.ReactNode }) {
       {children}
     </p>
   );
-}
-
-export function capitalize(s?: string | null) {
-  if (!s) return "";
-  return s[0].toUpperCase() + s.slice(1);
 }

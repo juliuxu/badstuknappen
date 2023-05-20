@@ -10,7 +10,7 @@ import {
 import picoCss from "@picocss/pico/css/pico.min.css";
 
 import style from "./style.css";
-import { OrderActions } from "./routes/order/route";
+import { OrderActions } from "./routes/order/order-actions";
 
 export default function App() {
   const [searchParams] = useSearchParams();
