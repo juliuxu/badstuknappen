@@ -1,4 +1,4 @@
-import type { TimeAndPlace } from "./routes/api.order/schema.server";
+import type { TimeAndPlace } from "./schema/time-and-place.server";
 
 // https://stackoverflow.com/questions/1579010/get-next-date-from-weekday-in-javascript
 function nextDate(dayIndex: number, fromDate: Date) {

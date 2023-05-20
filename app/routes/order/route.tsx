@@ -4,21 +4,25 @@ import { json } from "@remix-run/node";
 import { useLoaderData, useSearchParams } from "@remix-run/react";
 
 import aerfuglSound from "~/assets/aerfugl-oh.mp3";
-import { getOrderRequestFromUrl } from "../api.order/schema.server";
+import { getOrderInfoFromUrl } from "../../schema/order-info.server";
 import { requirePassword } from "../login/route";
 import { OrderStatus } from "../api.order/order-status";
 import { showConfetti } from "./confetti.client";
 import { FormattedTimeAndPlace } from "~/utils";
+import { serializePersonInfoToCookie } from "~/schema/person-info.server";
 
 const title = "🧖 Bestill Badstue 🌊";
 export const meta: V2_MetaFunction = () => {
   return [{ title }];
 };
 
-export const loader = ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderArgs) => {
   requirePassword(request);
-  const orderInfo = getOrderRequestFromUrl(request.url);
-  return json({ orderInfo });
+  const orderInfo = getOrderInfoFromUrl(request.url);
+  return json(
+    { orderInfo },
+    { headers: { "Set-Cookie": await serializePersonInfoToCookie(orderInfo) } }
+  );
 };
 
 type EventType = {

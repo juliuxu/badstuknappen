@@ -4,17 +4,20 @@ import type {
   V2_MetaFunction,
 } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData, useSearchParams } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
-import {
-  FormattedTimeAndPlace,
-  capitalize,
-  isLocalUrl,
-  nesteUkedagToDate,
-  ukedager,
-} from "~/utils";
+
+import { capitalize, isLocalUrl, nesteUkedagToDate, ukedager } from "~/utils";
 import style from "./style.css";
 import { requirePassword } from "../login/route";
+import { safeParseShareFromUrl } from "~/schema/share.server";
+import { safeParseTimeAndPlaceFromUrl } from "~/schema/time-and-place.server";
+import {
+  safeParsePersonInfoFromCookie,
+  safeParsePersonInfoFromUrl,
+} from "~/schema/person-info.server";
+import { getOtherFromUrl } from "~/schema/order-info.server";
+import { YouHaveBeenInvitedMessage } from "./share";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: style }];
 
@@ -29,25 +32,26 @@ export const meta: V2_MetaFunction = () => {
   ];
 };
 
-export const loader = ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderArgs) => {
   requirePassword(request);
   return json({
     isLocal: isLocalUrl(request.url),
+    share: safeParseShareFromUrl(request.url),
+    timeAndPlace: safeParseTimeAndPlaceFromUrl(request.url),
+    personInfo:
+      safeParsePersonInfoFromUrl(request.url) ??
+      (await safeParsePersonInfoFromCookie(request.headers.get("Cookie"))),
+    other: getOtherFromUrl(request.url),
   });
 };
 
 export default function Component() {
-  const { isLocal } = useLoaderData<typeof loader>();
-
-  const [search] = useSearchParams();
-
-  const defaultDate = search.get("date") ?? undefined;
+  const { isLocal, share, timeAndPlace, personInfo, other } =
+    useLoaderData<typeof loader>();
 
   // Date selector logic
   const [dateFormat, setDateformat] = useState<"relative" | "absolute">(
-    defaultDate === undefined || defaultDate?.startsWith("neste-")
-      ? "relative"
-      : "absolute"
+    timeAndPlace?.date ? "absolute" : "relative"
   );
   useEffect(() => {
     if (dateFormat === "absolute") {
@@ -59,53 +63,22 @@ export default function Component() {
     }
   }, [dateFormat]);
 
-  let shareMessage = undefined;
-  if (
-    search.get("share") &&
-    search.get("sted") &&
-    search.get("time") &&
-    defaultDate !== undefined
-  ) {
-    const date = defaultDate.startsWith("neste-")
-      ? nesteUkedagToDate(defaultDate.split("-")[1] as any)
-      : defaultDate;
-    const time = search.get("time") ?? "18:00";
-    shareMessage = (
-      <>
-        🎉 Du har blitt invitert med i badstuen{" "}
-        <FormattedTimeAndPlace
-          {...{ date, time, sted: search.get("sted") as "sukkerbiten" }}
-        />
-        . Bli med da vell 🧖
-      </>
-    );
-  }
-
   return (
     <main className="container">
-      {shareMessage && (
+      {share && (
         <div id="top-alert">
-          <Alert>{shareMessage}</Alert>
+          <Alert>{<YouHaveBeenInvitedMessage {...share} />}</Alert>
         </div>
       )}
       <form action="/order" method="get">
-        <input
-          hidden
-          readOnly
-          name="password"
-          value={search.get("password") ?? ""}
-        />
+        <input hidden readOnly name="password" value={other.password} />
 
         <div className="grid">
           <article>
             <h2>Tid og sted</h2>
             <label>
               Sted
-              <select
-                required
-                name="sted"
-                defaultValue={search.get("sted") ?? undefined}
-              >
+              <select required name="sted" defaultValue={timeAndPlace?.sted}>
                 <option value="sukkerbiten">Sukkerbiten</option>
                 <option value="langkaia">Langkaia</option>
               </select>
@@ -130,7 +103,7 @@ export default function Component() {
                         type="radio"
                         name="date"
                         value={`neste-${dag}`}
-                        defaultChecked={defaultDate === `neste-${dag}`}
+                        // defaultChecked={defaultDate === `neste-${dag}`}
                         required
                         onClick={() => {
                           // Preview the date
@@ -148,12 +121,7 @@ export default function Component() {
                 <label>
                   Eller dato
                   <input
-                    defaultValue={
-                      defaultDate !== undefined &&
-                      !defaultDate?.startsWith("neste-")
-                        ? defaultDate
-                        : undefined
-                    }
+                    defaultValue={timeAndPlace?.date}
                     disabled={dateFormat !== "absolute"}
                     required
                     name="date"
@@ -166,7 +134,7 @@ export default function Component() {
             <label>
               Tidspunkt
               <input
-                defaultValue={search.get("time") ?? undefined}
+                defaultValue={timeAndPlace?.time}
                 required
                 name="time"
                 inputMode="numeric"
@@ -174,9 +142,9 @@ export default function Component() {
               />
             </label>
           </article>
-          {shareMessage && (
+          {share && (
             <div id="middle-alert">
-              <Alert>{shareMessage}</Alert>
+              <Alert>{<YouHaveBeenInvitedMessage {...share} />}</Alert>
             </div>
           )}
           <article>
@@ -188,14 +156,7 @@ export default function Component() {
                   role="switch"
                   type="checkbox"
                   autoComplete="off"
-                  // Hack to know when the form has been previously
-                  // prefilled
-                  // When the checkbox is unchecked, the value is not sent
-                  defaultChecked={
-                    search.get("antall") === null
-                      ? true
-                      : search.get("isMember") === "on"
-                  }
+                  defaultChecked={personInfo ? personInfo.isMember : true}
                 />
                 Er medlem
                 <small style={{ marginTop: 8 }}>
@@ -212,11 +173,7 @@ export default function Component() {
             </fieldset>
             <label>
               Antall
-              <select
-                required
-                name="antall"
-                defaultValue={search.get("antall") ?? undefined}
-              >
+              <select required name="antall" defaultValue={personInfo?.antall}>
                 {Array(4)
                   .fill(0)
                   .map((_, i) => (
@@ -231,11 +188,11 @@ export default function Component() {
               <label>
                 Fornavn
                 <input
-                  autoFocus={search.get("share") === "true"}
+                  autoFocus={share !== undefined}
                   required
                   name="fornavn"
                   type="text"
-                  defaultValue={search.get("fornavn") ?? undefined}
+                  defaultValue={personInfo?.fornavn}
                 />
               </label>
               <label>
@@ -244,7 +201,7 @@ export default function Component() {
                   required
                   name="etternavn"
                   type="text"
-                  defaultValue={search.get("etternavn") ?? undefined}
+                  defaultValue={personInfo?.etternavn}
                 />
               </label>
             </div>
@@ -255,7 +212,7 @@ export default function Component() {
                   required
                   name="epost"
                   type="email"
-                  defaultValue={search.get("epost") ?? undefined}
+                  defaultValue={personInfo?.epost}
                 />
               </label>
               <label>
@@ -264,7 +221,7 @@ export default function Component() {
                   required
                   name="mobil"
                   type="tel"
-                  defaultValue={search.get("mobil") ?? undefined}
+                  defaultValue={personInfo?.mobil}
                 />
               </label>
             </div>
@@ -272,7 +229,7 @@ export default function Component() {
           </article>
         </div>
 
-        {isLocal && true && (
+        {isLocal && (
           <article>
             <h2>Utvikler opsjoner</h2>
             <fieldset>

@@ -1,13 +1,13 @@
 import type { LoaderArgs } from "@remix-run/node";
 import { placeOrder } from "./order.server";
 import { eventStream } from "remix-utils";
-import { getOrderRequestFromUrl } from "./schema.server";
+import { getOrderInfoFromUrl } from "../../schema/order-info.server";
 import { mockPlaceOrder } from "./mock-order.server";
 import { requirePassword } from "../login/route";
 
 export const loader = async ({ request }: LoaderArgs) => {
   requirePassword(request);
-  const orderInfo = getOrderRequestFromUrl(request.url);
+  const orderInfo = getOrderInfoFromUrl(request.url);
 
   const abortController = new AbortController();
   request.signal.addEventListener("abort", () => abortController.abort());

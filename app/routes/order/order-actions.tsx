@@ -1,5 +1,5 @@
 import { useRouteLoaderData, useSearchParams } from "@remix-run/react";
-import type { OrderRequest } from "../api.order/schema.server";
+import type { OrderInfo } from "../../schema/order-info.server";
 import { buildShareLinkAndData } from "../_index/share";
 
 export function OrderActions() {
@@ -7,7 +7,7 @@ export function OrderActions() {
   const data = useRouteLoaderData("routes/order");
   if (!data) return null;
 
-  const { orderInfo } = data as { orderInfo: OrderRequest };
+  const { orderInfo } = data as { orderInfo: OrderInfo };
 
   const editLink = `/?${searchParams}`;
   const { shareLink, shareData } = buildShareLinkAndData(orderInfo);
