@@ -34,18 +34,22 @@ export const meta: V2_MetaFunction<typeof loader> = ({ data }) => {
     const { shareData } = buildShareLinkAndData(data.share as Share);
     return [
       { title: shareData.title },
+      { property: "og:title", content: shareData.title },
+      { property: "twitter:title", content: shareData.title },
       {
         name: "description",
         content: shareData.text,
       },
       {
-        name: "og:image",
+        property: "og:image",
         content: `${
           data.isLocal
             ? "http://localhost:3000"
             : "https://badstuknappen.julianjark.no"
         }/api/og?${new URLSearchParams(data.share)}`,
       },
+      { property: "og:type", content: "summary_large_image" },
+      { property: "twitter:card", content: "summary_large_image" },
     ];
   }
 
