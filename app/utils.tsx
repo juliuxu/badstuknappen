@@ -61,7 +61,12 @@ export function formatDateTime({
   time: string;
   date: string | Date;
 }) {
-  const formatter = new Intl.DateTimeFormat("no-nb", { dateStyle: "full" });
+  const formatter = new Intl.DateTimeFormat("no-nb", {
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+    timeZone: "Europe/Oslo",
+  });
 
   // 07 -> 07:00
   // 7 -> 07:00

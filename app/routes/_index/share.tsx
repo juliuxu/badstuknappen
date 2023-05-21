@@ -1,5 +1,8 @@
-import { FormattedTimeAndPlace, formattedTimeAndPlace } from "~/utils";
-import type { OrderInfo } from "../../schema/order-info.server";
+import {
+  FormattedTimeAndPlace,
+  capitalize,
+  formattedTimeAndPlace,
+} from "~/utils";
 import type { Share } from "~/schema/share.server";
 
 type YouHaveBeenInvitedMessageProps = Omit<Share, "relativeDate">;
@@ -19,7 +22,7 @@ export const buildShareLinkAndData = ({
   date,
   time,
   sted,
-}: OrderInfo) => {
+}: Share) => {
   const shareLink = `/?${new URLSearchParams({
     password,
     date,
@@ -29,8 +32,12 @@ export const buildShareLinkAndData = ({
   })}`;
 
   const shareData = {
-    title: `Badstu ${sted}`,
-    text: `Bli med i badstuen ${formattedTimeAndPlace({ date, time, sted })}`,
+    title: `Badstu ${capitalize(sted)}`,
+    text: `Bli med i badstuen ${formattedTimeAndPlace({
+      date,
+      time,
+      sted,
+    })} 🧖`,
     url: shareLink,
   };
 

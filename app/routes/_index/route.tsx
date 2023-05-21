@@ -16,6 +16,7 @@ import {
 } from "~/utils";
 import style from "./style.css";
 import { requirePassword } from "../login/route";
+import type { Share } from "~/schema/share.server";
 import { safeParseShareFromUrl } from "~/schema/share.server";
 import { safeParseTimeAndPlaceFromUrl } from "~/schema/time-and-place.server";
 import {
@@ -23,14 +24,26 @@ import {
   safeParsePersonInfoFromUrl,
 } from "~/schema/person-info.server";
 import { getOtherFromUrl } from "~/schema/order-info.server";
-import { YouHaveBeenInvitedMessage } from "./share";
+import { YouHaveBeenInvitedMessage, buildShareLinkAndData } from "./share";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: style }];
 
-const title = "Badstuknappen";
-export const meta: V2_MetaFunction = () => {
+export const meta: V2_MetaFunction<typeof loader> = ({ data }) => {
+  // When shared
+  if (data?.share) {
+    const { shareData } = buildShareLinkAndData(data.share as Share);
+    return [
+      { title: shareData.title },
+      {
+        name: "description",
+        content: shareData.text,
+      },
+    ];
+  }
+
+  // Default
   return [
-    { title },
+    { title: "Badstuknappen" },
     {
       name: "description",
       content: "Beste måten å bestille ditt neste badstu besøk på",
