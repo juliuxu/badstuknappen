@@ -7,7 +7,13 @@ import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
 
-import { capitalize, isLocalUrl, nesteUkedagToDate, ukedager } from "~/utils";
+import {
+  capitalize,
+  dateToDashedDateString,
+  isLocalUrl,
+  nesteUkedagToDate,
+  ukedager,
+} from "~/utils";
 import style from "./style.css";
 import { requirePassword } from "../login/route";
 import { safeParseShareFromUrl } from "~/schema/share.server";
@@ -51,7 +57,7 @@ export default function Component() {
 
   // Date selector logic
   const [dateFormat, setDateformat] = useState<"relative" | "absolute">(
-    timeAndPlace?.date ? "absolute" : "relative"
+    timeAndPlace?.relativeDate ? "relative" : "absolute"
   );
   useEffect(() => {
     if (dateFormat === "absolute") {
@@ -101,9 +107,11 @@ export default function Component() {
                     <label key={dag}>
                       <input
                         type="radio"
-                        name="date"
+                        name="relativeDate"
                         value={`neste-${dag}`}
-                        // defaultChecked={defaultDate === `neste-${dag}`}
+                        defaultChecked={
+                          timeAndPlace?.relativeDate !== undefined
+                        }
                         required
                         onClick={() => {
                           // Preview the date
@@ -121,12 +129,12 @@ export default function Component() {
                 <label>
                   Eller dato
                   <input
-                    defaultValue={timeAndPlace?.date}
+                    defaultValue={timeAndPlace && timeAndPlace.date}
                     disabled={dateFormat !== "absolute"}
                     required
                     name="date"
                     type="date"
-                    min={new Date().toISOString().split("T")[0]}
+                    min={dateToDashedDateString(new Date())}
                   />
                 </label>
               </div>
@@ -188,7 +196,7 @@ export default function Component() {
               <label>
                 Fornavn
                 <input
-                  autoFocus={share !== undefined}
+                  autoFocus={Boolean(share)}
                   required
                   name="fornavn"
                   type="text"

@@ -1,10 +1,12 @@
 import { z } from "zod";
 import { timeAndPlaceSchema } from "./time-and-place.server";
 
-export const shareSchema = timeAndPlaceSchema.extend({
-  share: z.literal("true"),
-  password: z.string().min(1),
-});
+export const shareSchema = timeAndPlaceSchema.and(
+  z.object({
+    share: z.literal("true"),
+    password: z.string().min(1),
+  })
+);
 export type Share = z.infer<typeof shareSchema>;
 
 export const safeParseShareFromUrl = (url: string) => {

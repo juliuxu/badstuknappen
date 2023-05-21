@@ -13,16 +13,11 @@ export const getOtherFromUrl = (url: string) =>
   otherSchema.parse(Object.fromEntries(new URL(url).searchParams));
 
 // The requirement for an order
-const orderInfoSchema = z
-  .object({})
-  .merge(timeAndPlaceSchema)
-  .merge(personInfoSchema)
-  .merge(otherSchema);
+const orderInfoSchema = timeAndPlaceSchema
+  .and(personInfoSchema)
+  .and(otherSchema);
 
-export type OrderInfo = Prettify<z.infer<typeof orderInfoSchema>>;
-type Prettify<T> = {
-  [K in keyof T]: T[K];
-};
+export type OrderInfo = z.infer<typeof orderInfoSchema>;
 
 export const getOrderInfoFromUrl = (url: string) =>
   orderInfoSchema.parse(Object.fromEntries(new URL(url).searchParams));

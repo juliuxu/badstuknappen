@@ -2,7 +2,7 @@ import { FormattedTimeAndPlace, formattedTimeAndPlace } from "~/utils";
 import type { OrderInfo } from "../../schema/order-info.server";
 import type { Share } from "~/schema/share.server";
 
-type YouHaveBeenInvitedMessageProps = Share;
+type YouHaveBeenInvitedMessageProps = Omit<Share, "relativeDate">;
 export function YouHaveBeenInvitedMessage(
   props: YouHaveBeenInvitedMessageProps
 ) {
@@ -17,12 +17,11 @@ export function YouHaveBeenInvitedMessage(
 export const buildShareLinkAndData = ({
   password,
   date,
-  sted,
   time,
+  sted,
 }: OrderInfo) => {
   const shareLink = `/?${new URLSearchParams({
     password,
-    date,
     sted,
     time,
     share: "true",

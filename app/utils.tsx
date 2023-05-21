@@ -40,10 +40,14 @@ export function nesteUkedagToDate(value: Ukedag, fromDate = new Date()) {
 
   const date = nextDate(ukedagToDayIndex[value], fromDate);
 
-  // Format the date, like so 2023-05-03
-  // Using the system timezone
-  // using `toISOString` causes the timezone to be different
-  // resulting in wrong dates when the time is right after midnight (local time)
+  return dateToDashedDateString(date);
+}
+
+// Format a date, like so 2023-05-03
+// Using the system timezone
+// using `toISOString` causes the timezone to be different
+// resulting in wrong dates when the time is right after midnight (local time)
+export function dateToDashedDateString(date: Date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
     2,
     "0"
@@ -75,11 +79,19 @@ export function formatDateTime({
   return { formattedDate, formatedClockTime };
 }
 
-export function formattedTimeAndPlace({ time, date, sted }: TimeAndPlace) {
+export function formattedTimeAndPlace({
+  time,
+  date,
+  sted,
+}: Omit<TimeAndPlace, "relativeDate">) {
   const { formattedDate, formatedClockTime } = formatDateTime({ time, date });
   return `${formatedClockTime} ${formattedDate} på ${capitalize(sted)}`;
 }
-export function FormattedTimeAndPlace({ time, date, sted }: TimeAndPlace) {
+export function FormattedTimeAndPlace({
+  time,
+  date,
+  sted,
+}: Omit<TimeAndPlace, "relativeDate">) {
   const { formattedDate, formatedClockTime } = formatDateTime({ time, date });
   return (
     <>
