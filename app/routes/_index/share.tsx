@@ -22,8 +22,9 @@ export const buildShareLinkAndData = ({
 }: OrderInfo) => {
   const shareLink = `/?${new URLSearchParams({
     password,
-    sted,
+    date,
     time,
+    sted,
     share: "true",
   })}`;
 
