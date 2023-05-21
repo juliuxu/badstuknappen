@@ -131,7 +131,7 @@ export default function Component() {
                         name="date"
                         value={`neste-${dag}`}
                         defaultChecked={
-                          timeAndPlace?.relativeDate !== undefined
+                          timeAndPlace?.relativeDate === `neste-${dag}`
                         }
                         required
                         onClick={() => {
