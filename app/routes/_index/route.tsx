@@ -97,7 +97,12 @@ export default function Component() {
   return (
     <main className="container">
       {share && (
-        <div id="top-alert">
+        <div
+          id="top-alert"
+          ref={(e) => {
+            e?.scrollIntoView({ behavior: "smooth" });
+          }}
+        >
           <Alert>{<YouHaveBeenInvitedMessage {...share} />}</Alert>
         </div>
       )}
@@ -176,7 +181,12 @@ export default function Component() {
             </label>
           </article>
           {share && (
-            <div id="middle-alert">
+            <div
+              id="middle-alert"
+              ref={(e) => {
+                e?.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
               <Alert>{<YouHaveBeenInvitedMessage {...share} />}</Alert>
             </div>
           )}
@@ -221,7 +231,6 @@ export default function Component() {
               <label>
                 Fornavn
                 <input
-                  autoFocus={Boolean(share)}
                   required
                   name="fornavn"
                   type="text"
