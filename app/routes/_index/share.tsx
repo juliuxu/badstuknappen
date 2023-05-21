@@ -4,6 +4,7 @@ import {
   formattedTimeAndPlace,
 } from "~/utils";
 import type { Share } from "~/schema/share.server";
+import type { OrderInfo } from "~/schema/order-info.server";
 
 type YouHaveBeenInvitedMessageProps = Omit<Share, "relativeDate">;
 export function YouHaveBeenInvitedMessage(
@@ -20,12 +21,13 @@ export function YouHaveBeenInvitedMessage(
 export const buildShareLinkAndData = ({
   password,
   date,
+  relativeDate,
   time,
   sted,
-}: Share) => {
+}: Share & Pick<OrderInfo, "relativeDate">) => {
   const shareLink = `/?${new URLSearchParams({
     password,
-    date,
+    date: relativeDate ?? date,
     time,
     sted,
     share: "true",
