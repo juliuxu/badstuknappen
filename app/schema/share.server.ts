@@ -9,6 +9,9 @@ export const shareSchema = timeAndPlaceSchema.and(
 );
 export type Share = z.infer<typeof shareSchema>;
 
+export const getShareFromUrl = (url: string) =>
+  shareSchema.parse(Object.fromEntries(new URL(url).searchParams));
+
 export const safeParseShareFromUrl = (url: string) => {
   const parsed = shareSchema.safeParse(
     Object.fromEntries(new URL(url).searchParams)

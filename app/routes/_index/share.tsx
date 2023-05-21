@@ -37,7 +37,7 @@ export const buildShareLinkAndData = ({
       date,
       time,
       sted,
-    })} 🧖`,
+    })}`,
     url: shareLink,
   };
 

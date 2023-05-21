@@ -38,6 +38,14 @@ export const meta: V2_MetaFunction<typeof loader> = ({ data }) => {
         name: "description",
         content: shareData.text,
       },
+      {
+        name: "og:image",
+        content: `${
+          data.isLocal
+            ? "http://localhost:3000"
+            : "https://badstuknappen.julianjark.no"
+        }/api/og?${new URLSearchParams(data.share)}`,
+      },
     ];
   }
 

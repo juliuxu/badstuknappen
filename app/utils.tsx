@@ -54,6 +54,12 @@ export function dateToDashedDateString(date: Date) {
   )}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
+export const dateFormatter = new Intl.DateTimeFormat("no-nb", {
+  weekday: "long",
+  day: "2-digit",
+  month: "long",
+  timeZone: "Europe/Oslo",
+});
 export function formatDateTime({
   time,
   date,
@@ -61,13 +67,6 @@ export function formatDateTime({
   time: string;
   date: string | Date;
 }) {
-  const formatter = new Intl.DateTimeFormat("no-nb", {
-    weekday: "long",
-    day: "2-digit",
-    month: "long",
-    timeZone: "Europe/Oslo",
-  });
-
   // 07 -> 07:00
   // 7 -> 07:00
   // 8.5 -> 08:30
@@ -79,7 +78,7 @@ export function formatDateTime({
   };
 
   const formatedClockTime = shortTimeToClockTime(time);
-  const formattedDate = formatter.format(new Date(date));
+  const formattedDate = dateFormatter.format(new Date(date));
 
   return { formattedDate, formatedClockTime };
 }
