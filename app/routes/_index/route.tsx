@@ -107,7 +107,7 @@ export default function Component() {
                     <label key={dag}>
                       <input
                         type="radio"
-                        name="relativeDate"
+                        name="date"
                         value={`neste-${dag}`}
                         defaultChecked={
                           timeAndPlace?.relativeDate !== undefined
