@@ -14,11 +14,11 @@
     "@remix-run/serve": "1.16.1",
     "canvas-confetti": "1.6.0",
     "isbot": "^3.6.8",
-    "playwright": "1.34.0",
+    "playwright": "1.34.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "remix-utils": "6.3.0",
-    "satori": "0.8.1",
+    "satori": "0.9.1",
     "svg2img": "1.0.0-beta.2",
     "zod": "3.21.4"
   },
