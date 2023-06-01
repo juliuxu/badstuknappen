@@ -1,4 +1,8 @@
-import type { ActionArgs, LinksFunction } from "@remix-run/node";
+import type {
+  ActionArgs,
+  LinksFunction,
+  V2_MetaFunction,
+} from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { useActionData, useSearchParams } from "@remix-run/react";
@@ -34,7 +38,7 @@ export const action = async ({ request }: ActionArgs) => {
   return json({ success: false });
 };
 
-export const meta = () => [{ title: "Logg inn" }];
+export const meta: V2_MetaFunction = () => [{ title: "Logg inn" }];
 
 export default function Component() {
   const [searchParams] = useSearchParams();
