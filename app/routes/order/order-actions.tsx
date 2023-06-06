@@ -33,7 +33,10 @@ export function OrderActions() {
             ) {
               e.preventDefault();
               console.log("sharing", shareData);
-              navigator.share(shareData);
+              navigator.share({
+                ...shareData,
+                text: shareData.text + " " + shareLink,
+              });
             }
           }}
         >

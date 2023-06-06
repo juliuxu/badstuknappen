@@ -39,7 +39,7 @@ export const buildShareLinkAndData = ({
       date,
       time,
       sted,
-    })} ${shareLink}`,
+    })}`,
     url: shareLink,
   };
 
